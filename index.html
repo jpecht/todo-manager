@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>To-Do Manager</title>
+		<meta name="description" content="">
+		<meta name="author" content="jpecht">
+
+		<meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+		<link rel="shortcut icon" href="/favicon.ico">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		
+		<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" media="all">
+		<link rel="stylesheet" href="css/nprogress.css">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+
+	<body>
+		<header>To-Do Manager</header>
+		
+		<div class="login-status-container">
+			<div class="login-link link">login</div>
+			<div class="login-info"></div>
+			<div class="login-container">
+				<form id="login-form" class="form-inline" role="form">
+					<div><input id="login-form-username" class="form-control" placeholder="username"></div>
+					<div class="margin-10"><input id="login-form-password" class="form-control" type="password" placeholder="password"></div>
+					<div class="right margin-10"><button type="submit" class="btn btn-default">Submit</button></div>
+				</form>
+			</div>
+		</div>
+		
+		<div class="masterlist container-fluid">
+			<div class="row">
+				<div class="col-xs-12 col-sm-4">
+					<div class="block block-s">
+						<div class="block-title">small</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-4">
+					<div class="block block-m">
+						<div class="block-title">medium</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-4">
+					<div class="block block-l">
+						<div class="block-title">large</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="cmdline-container center">
+			<input class="cmdline">
+			<div class="cmdline-info">command line</div>
+		</div>
+		
+		<div class="docs">
+			<div class="docs-title link">show help</div>
+			<div class="docs-text">
+				<p>To add to the "small" list, type <kbd>add "clean room" -s</kbd></p>
+				<p>Similarly, suffix your code with <kbd>-m</kbd> or <kbd>-l</kbd> to add to the "medium" and "large" lists</p>
+			</div>
+		</div>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="lib/jquery.noty.packaged.min.js"></script>
+		<script src="lib/nprogress.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+</html>
