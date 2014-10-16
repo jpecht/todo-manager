@@ -7,24 +7,44 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	var user_id = -1,
 		username = '';
 	
-	/* --- Login --- */
-	$('.login-container').hide();
-	$('.login-link').click(function() {
-		$('.login-link').hide();
-		$('.login-container').show();
+	/* --- Register --- */
+	$('#register-form').on('submit', function(evt) {
+		evt.preventDefault();
+		NProgress.start();
+		
+		$.post('php/register.php', {
+			email: $('#register-form-email').val(),
+			username: $('#register-form-username').val(),
+			passhash: md5($('#register-form-password').val())
+		}).always(function(data) {
+			NProgress.done();
+			
+			console.log('always');
+			console.log(data);
+		}).done(function(data) {
+			console.log('done');
+			console.log(data);
+		}).fail(function() {
+			console.log('fail');
+			console.log(data);			
+		});
 	});
 	
+	/* --- Login --- */
 	$('#login-form').on('submit', function(evt) {
 		evt.preventDefault();
 		NProgress.start();
 		
 		$.post('php/login.php', {
 			username: $('#login-form-username').val(),
-			password: $('#login-form-password').val()
+			passhash: md5($('#login-form-password').val())
 		}).always(function() {
 			$('.login-container').hide();
 			NProgress.done();
 		}).done(function(data) {
+			
+			console.log(data);
+			
 			try { var response = $.parseJSON(data); }
 			catch(e) {
 				console.log(e);
@@ -94,7 +114,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			}
 
 			for (var i = 0; i < tasks.length; i++) {
-				addTaskToDisplay(tasks[i].task, tasks[i].list);
+				addTaskToDisplay(tasks[i]);
 			}
 		}).fail(function() {
 			
@@ -115,22 +135,13 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				return;
 			}
 
-			addTaskToDisplay(taskObj.task, taskObj.list, taskObj.date_created);
+			addTaskToDisplay(taskObj);
 		}).fail(function(data) {
 			console.log(data);
 			noty({type: 'warning', text: 'Failed to contact server'});
 		});
 	};
-	var addTaskToDisplay = function(task, list, date_created) {
-		$('.block-' + list).append('<div class="task">' + task + '</div>');	
+	var addTaskToDisplay = function(task) {
+		$('.block-' + task.list).append('<div class="task">' + task.task + '</div>');	
 	};
-
-		
-	/* --- Docs functionality --- */
-	$('.docs-title').click(function() {
-		$('.docs-text').toggle();
-		$('.docs-title').text(function() {
-			return ($('.docs-text').is(':visible'))	? 'hide help' : 'show help';
-		});
-	});
 })();

@@ -1,25 +1,38 @@
 <?php
 	require_once('config.php');	
 
-    $connection = mysqli_connect('localhost', MYSQL_USERNAME, MYSQL_PASSWORD, 'todo');
+    $connection = mysqli_connect('jpecht.db', MYSQL_USERNAME, MYSQL_PASSWORD, 'todo');
 	if (mysqli_connect_errno()) {
 		echo 'Failed to connect to MySQL: ' . mysqli_connect_error();
 		exit();
 	}
 	
-	$user_name = $_REQUEST['username'];
-	$password = $_REQUEST['password'];
+	$username = $_REQUEST['username'];
+	$passhash = $_REQUEST['passhash'];
 	
-	$query = 'SELECT user_id FROM users WHERE user_name = "' . $user_name . '" AND password="' . $password . '"'; 
+	$query = 'SELECT salt, saltedpw FROM users WHERE username = "' . $username . '"'; 
 	$result = mysqli_query($connection, $query);
-	$user_id = mysqli_fetch_array($result)['user_id'];
 	
-	$return_array = array(
-		"user_id" => $user_id,
-		"user_name" => $user_name
-	);
+	if ($result) {
+		if (mysqli_num_rows($result) > 0) {
+			// compare salted pw
+			$result_array = mysqli_fetch_array($result);
+			$salt = $result_array['salt'];
+			$saltedpw = $result_array['saltedpw'];
 
-	echo json_encode($return_array);
+			$requested_saltedpw = md5($passhash . md5($salt));
+			if (strcmp($requested_saltedpw, $saltedpw) === 0) {
+				// passwords match; log them in
+				echo json_encode(array("success" => "success"));
+			} else {
+				echo json_encode(array("error" => "Incorrect password"));
+			}
+		} else {
+			echo json_encode(array("error" => "Username not found"));
+		}
+	} else {
+		echo json_encode(array("error" => "Failed query"));
+	}
 
 	mysqli_close($connection);
 ?>
