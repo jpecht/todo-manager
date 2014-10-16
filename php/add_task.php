@@ -13,10 +13,19 @@
 	$date_finished = -1;
 	$list_name = $_REQUEST['listName'];
 	
-	$query = 'INSERT INTO tasks VALUES (' . $user_id . ', "'. $task_name . '", "' . $date_created . '", ' . $date_finished . ', "' . $list_name . '")';
+	$keys = '(user_id, task, date_created, date_finished, list)';
+	$values = '(' . $user_id . ', "'. $task_name . '", "' . $date_created . '", ' . $date_finished . ', "' . $list_name . '")';
+	$query = 'INSERT INTO tasks ' . $keys . ' VALUES ' . $values;
+
 	$result = mysqli_query($connection, $query);
+
+	$return_array = array(
+		"task" => $task_name,
+		"list" => $list_name,
+		"date_created" => $date_created
+	);
 	
-	echo $result;
+	echo json_encode($return_array);
 	
 	mysqli_close($connection);
 ?>

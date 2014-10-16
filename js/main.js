@@ -18,33 +18,34 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		evt.preventDefault();
 		NProgress.start();
 		
-		username = $('#login-form-username').val();
 		$.post('php/login.php', {
-			username: username,
+			username: $('#login-form-username').val(),
 			password: $('#login-form-password').val()
 		}).always(function() {
 			$('.login-container').hide();
 			NProgress.done();
 		}).done(function(data) {
-			if (data === '') {
+			try { var response = $.parseJSON(data); }
+			catch(e) {
+				console.log(e);
+				noty({type: 'warning', text: 'There was a problem logging in. =('});
+				return;
+			}
+
+			if (user_id) {
+				user_id = response.user_id;
+				username = response.user_name;
+				$('.login-info').html('logged in as ' + username);
+				getTasks(user_id);
+			} else {
+				user_id = -1;
+				username = '';
 				$('.login-link').show();
 				noty({
 					type: 'warning', 
 					text: '<strong>Username/password combination is wrong.</strong><br/>Try using test/test for now.', 
 					timeout: 3000
 				});
-			} else {
-				try {
-					var response = $.parseJSON(data);
-				}
-				catch(e) {
-					console.log(e);
-					noty({type: 'warning', text: 'There was a problem retrieving your tasks. =('});
-				}
-
-				$('.login-info').html('logged in as ' + username);
-				user_id = data.user_id;
-				getTasks(user_id);
 			}
 		}).fail(function(data) {
 			console.log(data);
@@ -85,7 +86,13 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		}).always(function() {
 			
 		}).done(function(data) {
-			var tasks = $.parseJSON(data);			
+			try { var tasks = $.parseJSON(data); }
+			catch(e) {
+				console.log(e);
+				noty({type: 'warning', text: 'There was a problem retrieving your tasks. =('});
+				return;
+			}
+
 			for (var i = 0; i < tasks.length; i++) {
 				addTaskToDisplay(tasks[i].task, tasks[i].list);
 			}
@@ -101,18 +108,20 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		}).always(function() {
 			NProgress.done();
 		}).done(function(data) {
-			if (data === '1') {				
-				addTaskToDisplay(task, list);
-				//noty({type: 'success', text: 'Task added!'});
-			} else {
-				noty({type: 'warning', text: 'Failed to add task'});
+			try { var taskObj = $.parseJSON(data); }
+			catch(e) {
+				console.log(e);
+				noty({type: 'warning', text: 'There was a problem adding your task. =('});
+				return;
 			}
+
+			addTaskToDisplay(taskObj.task, taskObj.list, taskObj.date_created);
 		}).fail(function(data) {
 			console.log(data);
 			noty({type: 'warning', text: 'Failed to contact server'});
 		});
 	};
-	var addTaskToDisplay = function(task, list) {
+	var addTaskToDisplay = function(task, list, date_created) {
 		$('.block-' + list).append('<div class="task">' + task + '</div>');	
 	};
 

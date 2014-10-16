@@ -15,7 +15,8 @@
 	$user_id = mysqli_fetch_array($result)['user_id'];
 	
 	$return_array = array(
-		"user_id" => $user_id
+		"user_id" => $user_id,
+		"user_name" => $user_name
 	);
 
 	echo json_encode($return_array);
