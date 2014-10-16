@@ -34,8 +34,16 @@ $.noty.defaults.closeWith = ['click', 'button'];
 					timeout: 3000
 				});
 			} else {
+				try {
+					var response = $.parseJSON(data);
+				}
+				catch(e) {
+					console.log(e);
+					noty({type: 'warning', text: 'There was a problem retrieving your tasks. =('});
+				}
+
 				$('.login-info').html('logged in as ' + username);
-				user_id = data;
+				user_id = data.user_id;
 				getTasks(user_id);
 			}
 		}).fail(function(data) {

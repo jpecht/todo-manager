@@ -13,8 +13,12 @@
 	$query = 'SELECT user_id FROM users WHERE user_name = "' . $user_name . '" AND password="' . $password . '"'; 
 	$result = mysqli_query($connection, $query);
 	$user_id = mysqli_fetch_array($result)['user_id'];
-		
-	echo $user_id;
+	
+	$return_array = array(
+		"user_id" => $user_id
+	);
+
+	echo json_encode($return_array);
 
 	mysqli_close($connection);
 ?>
