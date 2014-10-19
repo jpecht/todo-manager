@@ -7,6 +7,23 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	var user_id = -1,
 		username = '';
 	
+	/* --- Check for Session --- */
+	$.post('php/init.php').done(function(data) {
+
+		console.log(data);
+
+		var response = $.parseJSON(data);
+		if (response.hasOwnProperty('username')) {
+			$('.logged-in-text').html('logged in as ' + response.username);
+
+			var scope = angular.element($('.status-overlay')).scope();
+			scope.$apply(function() {
+				scope.sc.buttonsShowing = false;
+			});
+		}
+	});
+
+
 	/* --- Register --- */
 	$('#register-form').on('submit', function(evt) {
 		evt.preventDefault();
@@ -41,10 +58,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		}).always(function() {
 			$('.login-container').hide();
 			NProgress.done();
-		}).done(function(data) {
-			
-			console.log(data);
-			
+		}).done(function(data) {			
 			try { var response = $.parseJSON(data); }
 			catch(e) {
 				console.log(e);
@@ -52,7 +66,13 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				return;
 			}
 
-			if (user_id) {
+			if (response.hasOwnProperty('error')) {
+				noty({type: 'warning', text: response.error, timeout: 3000});
+			} else {
+				window.location = './index.html';
+			}
+
+			/*if (user_id) {
 				user_id = response.user_id;
 				username = response.user_name;
 				$('.login-info').html('logged in as ' + username);
@@ -66,7 +86,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 					text: '<strong>Username/password combination is wrong.</strong><br/>Try using test/test for now.', 
 					timeout: 3000
 				});
-			}
+			}*/
 		}).fail(function(data) {
 			console.log(data);
 			noty({type: 'warning', text: 'Failed to contact server'});			

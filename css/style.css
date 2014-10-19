@@ -20,7 +20,7 @@ header {
 	font-size: 1em;
 	z-index: 30;
 }
-.status-info { color: green; }
+.logged-in-text { color: green; }
 .form-container {
 	position: absolute;
 	right: 40px;

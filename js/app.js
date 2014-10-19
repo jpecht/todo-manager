@@ -21,5 +21,8 @@
 			this.hideForm = function() {
 				this.formShowing = false;
 			};
+			this.logout = function() {
+				$.post('php/logout.php');
+			};
 		});
 })();

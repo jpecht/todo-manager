@@ -32,7 +32,11 @@
 					&nbsp; · &nbsp;
 					<span class="login-link link" ng-click="sc.showForm('login')">login</span>
 				</div>
-				<div class="status-info" ng-show="!sc.buttonsShowing"></div>
+				<div class="status-info" ng-show="!sc.buttonsShowing">
+					<span class="logged-in-text"></span>
+					&nbsp; · &nbsp;
+					<span class="logout-link link" ng-click="sc.logout()">logout</span>
+				</div>
 			</div>
 		
 			<div class="form-container" ng-show="sc.formShowing && sc.formType === 'register'">
