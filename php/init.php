@@ -8,7 +8,7 @@
 		if (strcmp($_SESSION['user_agent'], $_SERVER['HTTP_USER_AGENT']) === 0) {
 			// open connection
 			require_once('config.php');
-		    $connection = mysqli_connect('jpecht.db', MYSQL_USERNAME, MYSQL_PASSWORD, 'todo');
+		    $connection = mysqli_connect(HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, DB_NAME);
 			if (mysqli_connect_errno()) {
 				echo json_encode(array("error" => 'Failed to connect to MySQL: ' . mysqli_connect_error()));
 				exit();
@@ -27,7 +27,7 @@
 
 			// open connection
 			require_once('config.php');
-		    $connection = mysqli_connect('jpecht.db', MYSQL_USERNAME, MYSQL_PASSWORD, 'todo');
+		    $connection = mysqli_connect(HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, DB_NAME);
 			if (mysqli_connect_errno()) {
 				echo json_encode(array("error" => 'Failed to connect to MySQL: ' . mysqli_connect_error()));
 				exit();

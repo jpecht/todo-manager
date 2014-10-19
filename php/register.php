@@ -7,7 +7,7 @@
 	$passhash = $_REQUEST['passhash'];
 	$reg_date = date('Y-m-d H:i:s');
 
-    $connection = mysqli_connect('jpecht.db', MYSQL_USERNAME, MYSQL_PASSWORD, 'todo');
+    $connection = mysqli_connect(HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, DB_NAME);
 	if (mysqli_connect_errno()) {
 		echo json_encode(array("error" => 'Failed to connect to MySQL: ' . mysqli_connect_error()));
 		exit();
