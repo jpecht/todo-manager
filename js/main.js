@@ -4,22 +4,26 @@ $.noty.defaults.timeout = 1500;
 $.noty.defaults.closeWith = ['click', 'button'];
 
 (function() {
-	var user_id = -1,
-		username = '';
+	var USR = {'logged_in': false}; // user information (username, email, etc.)
 	
-	/* --- Check for Session --- */
+	/* --- Check for Returning User --- */
 	$.post('php/init.php').done(function(data) {
-
-		console.log(data);
-
 		var response = $.parseJSON(data);
-		if (response.hasOwnProperty('username')) {
-			$('.logged-in-text').html('logged in as ' + response.username);
+		
+		console.log(response);
+		
+		if (!response.hasOwnProperty('error')) {
+			USR.logged_in = true;
+			for (var ind in response) USR[ind] = response[ind];			
 
+			// hide buttons and show logged in text
+			$('.logged-in-text').html('logged in as ' + USR.username);	
 			var scope = angular.element($('.status-overlay')).scope();
 			scope.$apply(function() {
 				scope.sc.buttonsShowing = false;
 			});
+			
+			getTasks();
 		}
 	});
 
@@ -33,17 +37,17 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			email: $('#register-form-email').val(),
 			username: $('#register-form-username').val(),
 			passhash: md5($('#register-form-password').val())
-		}).always(function(data) {
+		}).always(function() {
 			NProgress.done();
-			
-			console.log('always');
-			console.log(data);
 		}).done(function(data) {
-			console.log('done');
+			if (data.hasOwnProperty('success')) {
+				noty({type: 'success', text: "<strong>You're registered!</strong><br/>Now log in."});
+			} else {
+				noty({type: 'warning', text: data.error});
+			}
+		}).fail(function(data) {
+			console.log('Error with register.php');
 			console.log(data);
-		}).fail(function() {
-			console.log('fail');
-			console.log(data);			
 		});
 	});
 	
@@ -69,24 +73,9 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			if (response.hasOwnProperty('error')) {
 				noty({type: 'warning', text: response.error, timeout: 3000});
 			} else {
+				// on success: refresh page
 				window.location = './index.html';
 			}
-
-			/*if (user_id) {
-				user_id = response.user_id;
-				username = response.user_name;
-				$('.login-info').html('logged in as ' + username);
-				getTasks(user_id);
-			} else {
-				user_id = -1;
-				username = '';
-				$('.login-link').show();
-				noty({
-					type: 'warning', 
-					text: '<strong>Username/password combination is wrong.</strong><br/>Try using test/test for now.', 
-					timeout: 3000
-				});
-			}*/
 		}).fail(function(data) {
 			console.log(data);
 			noty({type: 'warning', text: 'Failed to contact server'});			
@@ -97,11 +86,12 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	/* --- Command Line Input --- */
 	$('.cmdline').on('keypress', function(evt) {
 		if (evt.which === 13) {
-			if (username === '') {
+			if (!USR.logged_in) {
 				noty({type: 'warning', text: 'Log in first!'});				
 				return;
 			}
 			
+			// TODO write command line validation
 			var cmdStr = $('.cmdline').val();
 			var cmdIsValid = true;
 			
@@ -120,48 +110,35 @@ $.noty.defaults.closeWith = ['click', 'button'];
 
 
 	/* --- Task Management --- */
-	var getTasks = function(user_id) {
+	var getTasks = function() {
 		$.post('php/get_tasks.php', {
-			user_id: user_id			
+			user_id: USR.user_id
 		}).always(function() {
 			
 		}).done(function(data) {
-			try { var tasks = $.parseJSON(data); }
-			catch(e) {
-				console.log(e);
-				noty({type: 'warning', text: 'There was a problem retrieving your tasks. =('});
-				return;
-			}
-
-			for (var i = 0; i < tasks.length; i++) {
-				addTaskToDisplay(tasks[i]);
-			}
+			var tasks = $.parseJSON(data);
+			for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i].description, tasks[i].list_name);
 		}).fail(function() {
-			
+			console.log(data);
+			noty({type: 'warning', text: 'Failed to contact server'});
 		});
 	};
-	var addTask = function(task, list) {
+	var addTask = function(task, list) {		
 		$.post('php/add_task.php', {
-			user_id: user_id,
-			taskName: task,
-			listName: list
+			user_id: USR.user_id,
+			description: task,
+			list_name: list
 		}).always(function() {
 			NProgress.done();
 		}).done(function(data) {
-			try { var taskObj = $.parseJSON(data); }
-			catch(e) {
-				console.log(e);
-				noty({type: 'warning', text: 'There was a problem adding your task. =('});
-				return;
-			}
-
-			addTaskToDisplay(taskObj);
+			var taskObj = $.parseJSON(data);
+			addTaskToDisplay(task, list);
 		}).fail(function(data) {
 			console.log(data);
 			noty({type: 'warning', text: 'Failed to contact server'});
 		});
 	};
-	var addTaskToDisplay = function(task) {
-		$('.block-' + task.list).append('<div class="task">' + task.task + '</div>');	
+	var addTaskToDisplay = function(description, list_name) {
+		$('.block-' + list_name).append('<div class="task">' + description + '</div>');	
 	};
 })();

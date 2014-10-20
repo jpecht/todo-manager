@@ -17,7 +17,12 @@
 			$user_query = 'SELECT * FROM users WHERE id = ' . $user_id;
 			$user_result = mysqli_query($connection, $user_query);
 			$user_obj = mysqli_fetch_array($user_result);
-			echo json_encode(array('username' => $user_obj['username']));
+			echo json_encode(array(
+				'user_id' => $user_id,
+				'username' => $user_obj['username'],
+				'email' => $user_obj['email'],
+				'status' => 'session id exists'
+			));
 		} else {
 			echo json_encode(array('error' => 'different user agent detected'));
 		}
@@ -59,7 +64,12 @@
 					$update_query = 'UPDATE autologin SET last_used_on = "' . $datetime . '", last_used_ip = "' . $ip_add . '" WHERE user_id = ' . $user_id . ' AND public_key ="' . $publickey . '"';
 					mysqli_query($connection, $update_query);
 
-					echo json_encode(array("username" => $user_array['username']));
+					echo json_encode(array(
+						'user_id' => $user_id,
+						'username' => $user_array['username'],
+						'email' => $user_array['email'],
+						'status' => 'publickey cookie exists'
+					));
 				} else {
 					// cookie invalid
 					echo json_encode(array("error" => "private key does not match"));
@@ -71,8 +81,8 @@
 
 			mysqli_close($connection);
 		} else {
-			// cookie invalid
-			echo json_encode(array("error" => "publickey cookie not found"));
+			// cookie not available
+			echo json_encode(array("error" => "no cookie found"));
 		}
 	}
 ?>

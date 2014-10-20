@@ -1,6 +1,15 @@
 <?php
 	session_start();
-	if (is_set($_SESSION['USER_ID'])) unset($_SESSION['USER_ID']);
-	if (is_set($_COOKIE['publickey'])) unset($_COOKIE['publickey']);
+	
+	// unset session variables
+	session_unset(); 
+	
+	// clear cookies
+	if (isset($_COOKIE['publickey'])) {
+		unset($_COOKIE['publickey']);
+		setcookie('publickey', '', time() - 3600);
+	}
+	
+	// redirect (not working atm)
 	header('Location: http://www.jpecht.com/todo-man');
 ?>
