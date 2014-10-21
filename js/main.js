@@ -29,6 +29,14 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	/* --- Register --- */
 	$('#register-form').on('submit', function(evt) {
 		evt.preventDefault();
+		
+		// check if passwords match
+		if ($('#register-form-password').val() !== $('#register-form-confirm-pw').val()) {
+			$('#register-form-password, #register-form-confirm-pw').val('');
+			noty({layout: 'center', type: 'warning', text: '<strong>Passwords do not match!</strong><br/>Try harder ;)'});
+			return;
+		}
+		
 		NProgress.start();
 		
 		$.post('php/register.php', {

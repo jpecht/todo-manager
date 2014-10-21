@@ -24,6 +24,8 @@
 
 			$requested_saltedpw = md5($passhash . md5($salt));
 			if (strcmp($requested_saltedpw, $saltedpw) === 0) {
+				
+				// check for verification code if havent verified yet
 				if ($must_verify) {
 					if (isset($_REQUEST['token'])) {
 						$token = md5($user_array['email'] . $user_array['saltedpw']);

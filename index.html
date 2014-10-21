@@ -41,17 +41,18 @@
 		
 			<div class="form-container" ng-show="sc.formShowing && sc.formType === 'register'" ng-cloak>
 				<form id="register-form" class="form-inline" role="form">
-					<div class="margin-top-5"><input id="register-form-email" type="email" class="form-control" placeholder="email"></div>
-					<div class="margin-top-5"><input id="register-form-username" class="form-control" placeholder="username"></div>
-					<div class="margin-top-5"><input id="register-form-password" class="form-control" type="password" placeholder="password"></div>
+					<div class="margin-top-5"><input id="register-form-email" type="email" class="form-control" placeholder="email" required></div>
+					<div class="margin-top-5"><input id="register-form-username" class="form-control" placeholder="username" ng-minlength="2" required></div>
+					<div class="margin-top-5"><input id="register-form-password" class="form-control" type="password" placeholder="password" ng-minlength="6" ng-maxlength="20" required></div>
+					<div class="margin-top-5"><input id="register-form-confirm-pw" class="form-control" type="password" placeholder="confirm password" ng-minlength="6" ng-maxlength="20" required></div>
 					<div class="right margin-top-5"><button type="submit" class="btn btn-default">Register</button></div>
 				</form>
 				<img class="close-icon" src="img/close_16.png" width="16" height="16" ng-click="sc.hideForm()">
 			</div>
 			<div class="form-container" ng-show="sc.formShowing && sc.formType === 'login'" ng-cloak>
 				<form id="login-form" class="form-inline" role="form">
-					<div class="margin-top-5"><input id="login-form-username" class="form-control" placeholder="username"></div>
-					<div class="margin-top-5"><input id="login-form-password" class="form-control" type="password" placeholder="password"></div>
+					<div class="margin-top-5"><input id="login-form-username" class="form-control" placeholder="username" required></div>
+					<div class="margin-top-5"><input id="login-form-password" class="form-control" type="password" placeholder="password" required></div>
 					<div class="margin-top-5 center"><label>
 						<input type="checkbox" checked><span>&nbsp; remember me</span>
 					</label></div>

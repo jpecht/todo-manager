@@ -129,6 +129,8 @@ header {
 	z-index: 29;
 }
 
+.ng-dirty.ng-invalid { border-color: #FA787E; }
+.ng-dirty.ng-valid { border-color: #6ED064; }
 
 /* --- Helper Classes --- */
 .center { text-align: center; }
