@@ -12,7 +12,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 
 
 	/* --- Check for Returning User --- */
-	$.post('php/init.php').done(function(data) {
+	$.post('php/init.php').done(function(data) {		
 		var response = $.parseJSON(data);		
 		if (!response.hasOwnProperty('error')) {
 			USR.logged_in = true;
@@ -125,11 +125,14 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				if (cmd.action === 'add') addTask(cmd.description, cmd.list);
 				else if (cmd.action === 'rename') renameList(cmd.description, cmd.list);
 				
-				$('.cmdline').val('');
-				NProgress.done();
 			} else {
-				
+				if (cmd.error) {
+					noty({type: 'warning', text: '<strong>Invalid command!</strong><br/>' + cmd.error});	
+				} else {
+					noty({type: 'warning', text: '<strong>Invalid command!</strong><br/>Look at the docs below for clarification.'});
+				}
 			}
+			$('.cmdline').val('');
 		}
 	});
 
@@ -167,7 +170,10 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		$('.block-' + list_num).append('<div class="task">' + description + '</div>');	
 	};
 	var renameList = function(list_name, list_num) {
-		
+		NProgress.done();
+		$.post('php/rename_list.php', {
+			
+		});
 	};
 	
 	/* --- Command Validation --- */
