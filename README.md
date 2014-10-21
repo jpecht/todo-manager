@@ -1,4 +1,4 @@
 todo-manager
 ============
 
-minimal to-do manager
+A minimal to-do manager with a user account system
