@@ -5,19 +5,17 @@ $.noty.defaults.closeWith = ['click', 'button'];
 
 (function() {
 	var USR = {'logged_in': false}; // user information (username, email, etc.)
-	
+
+
 	/* --- Check for Returning User --- */
 	$.post('php/init.php').done(function(data) {
-		var response = $.parseJSON(data);
-		
-		console.log(response);
-		
+		var response = $.parseJSON(data);		
 		if (!response.hasOwnProperty('error')) {
 			USR.logged_in = true;
 			for (var ind in response) USR[ind] = response[ind];			
 
 			// hide buttons and show logged in text
-			$('.logged-in-text').html('logged in as ' + USR.username);	
+			$('.logged-in-text').html('logged in as ' + USR.username);
 			var scope = angular.element($('.status-overlay')).scope();
 			scope.$apply(function() {
 				scope.sc.buttonsShowing = false;
@@ -40,10 +38,15 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		}).always(function() {
 			NProgress.done();
 		}).done(function(data) {
-			if (data.hasOwnProperty('success')) {
-				noty({type: 'success', text: "<strong>You're registered!</strong><br/>Now log in."});
+			var response = $.parseJSON(data);
+			if (response.hasOwnProperty('success')) {
+				noty({type: 'success', text: "<strong>You're registered!</strong><br/>Check your email to log in."});
+				var scope = angular.element($('.status-overlay')).scope();
+				scope.$apply(function() {
+					scope.sc.hideForm();
+				});
 			} else {
-				noty({type: 'warning', text: data.error});
+				noty({type: 'warning', text: response.error});
 			}
 		}).fail(function(data) {
 			console.log('Error with register.php');
@@ -51,25 +54,31 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		});
 	});
 	
+
 	/* --- Login --- */
 	$('#login-form').on('submit', function(evt) {
 		evt.preventDefault();
 		NProgress.start();
-		
-		$.post('php/login.php', {
+
+		var loginData = {
 			username: $('#login-form-username').val(),
-			passhash: md5($('#login-form-password').val())
-		}).always(function() {
+			passhash: md5($('#login-form-password').val()),
+			autologin: $('#login-form input[type="checkbox"]').prop('checked')
+		};
+
+		// check for verification code in url
+		if (window.location.search.substr(0, 7) === '?token=') {
+			loginData.token = window.location.search.substring(7);
+		}
+		
+		$.post('php/login.php', loginData).always(function() {
 			$('.login-container').hide();
 			NProgress.done();
-		}).done(function(data) {			
-			try { var response = $.parseJSON(data); }
-			catch(e) {
-				console.log(e);
-				noty({type: 'warning', text: 'There was a problem logging in. =('});
-				return;
-			}
+		}).done(function(data) {
 
+			console.log(data);
+
+			var response = $.parseJSON(data);
 			if (response.hasOwnProperty('error')) {
 				noty({type: 'warning', text: response.error, timeout: 3000});
 			} else {
@@ -81,7 +90,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			noty({type: 'warning', text: 'Failed to contact server'});			
 		});
 	});
-	
+
 	
 	/* --- Command Line Input --- */
 	$('.cmdline').on('keypress', function(evt) {

@@ -1,5 +1,6 @@
 <?php
-	require_once('config.php');	
+	require_once('config.php');
+	require('phpmailer/PHPMailerAutoload.php');
     session_start();
 	
 	$email = $_REQUEST['email'];
@@ -31,9 +32,24 @@
 			// insert in database
 			$values = '("' . $username . '", "' . $email . '", "' . $salt . '", "' . $saltedpw . '", "' . $reg_date . '", "' . $reg_date . '", "' . $reg_ip . '", "' . $reg_ip . '")';
 			$insert_query = 'INSERT INTO users (username, email, salt, saltedpw, reg_date, last_login_date, reg_ip, last_login_ip) VALUES ' . $values;
-			$insert_result = mysqli_query($connection, $insert_query);
-			if ($insert_result)	echo json_encode(array("success" => "success"));
-			else echo json_encode(array('error' => 'Failed insert query'));
+			mysqli_query($connection, $insert_query);
+
+			// send email with verification to user
+			$verification_code = md5($email . $saltedpw);
+			$verification_link = 'http://www.jpecht.com/todo-man/index.html?token=' . $verification_code;
+			$mail = new PHPMailer;
+			$mail->From = 'me.jefferson@gmail.com';
+			$mail->FromName = 'Jefferson';
+			$mail->addAddress($email);
+			$mail->isHTML(true);
+			$mail->Subject = 'To-Do Manager Verification';
+			$mail->Body = 'Thanks for signing up for To-Do Manager!<br/> Click <a href="' . $verification_link . '">here</a> to verify your account and log in!';
+			if (!$mail->send()) {
+				echo json_encode(array('error' => 'Trouble sending email'));
+				exit;
+			}
+
+			echo json_encode(array('success' => 'success'));
 		}
 	} else {
 		echo json_encode(array('error' => 'Failed query'));

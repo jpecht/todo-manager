@@ -21,6 +21,7 @@ header {
 	z-index: 30;
 }
 .logged-in-text { color: green; }
+.logout-link { color: #E07373; }
 .form-container {
 	position: absolute;
 	right: 40px;
@@ -31,6 +32,10 @@ header {
 	border: 1px solid #CCC;
 	border-radius: 10px;
 	z-index: 30;
+}
+.form-container label {
+	font-size: 0.9em;
+	font-weight: 400;
 }
 .close-icon {
 	position: absolute;
@@ -74,7 +79,9 @@ header {
 	cursor: pointer;
 }
 .task:hover {
-	background-color: #F0F0F0;
+	background-color: #7B84AE;
+	color: white;
+	box-shadow: 1px 1px 4px rgba(0,0,0,0.5);
 }
 
 

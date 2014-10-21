@@ -27,19 +27,19 @@
 		
 		<div class="status-overlay" ng-controller="StatusController as sc">
 			<div class="status-container">
-				<div class="status-buttons" ng-show="sc.buttonsShowing">
+				<div class="status-buttons" ng-show="sc.buttonsShowing" ng-cloak>
 					<span class="register-link link" ng-click="sc.showForm('register')">register</span>
 					&nbsp; · &nbsp;
 					<span class="login-link link" ng-click="sc.showForm('login')">login</span>
 				</div>
-				<div class="status-info" ng-show="!sc.buttonsShowing">
+				<div class="status-info" ng-show="!sc.buttonsShowing" ng-cloak>
 					<span class="logged-in-text"></span>
 					&nbsp; · &nbsp;
 					<span class="logout-link link" ng-click="sc.logout()">logout</span>
 				</div>
 			</div>
 		
-			<div class="form-container" ng-show="sc.formShowing && sc.formType === 'register'">
+			<div class="form-container" ng-show="sc.formShowing && sc.formType === 'register'" ng-cloak>
 				<form id="register-form" class="form-inline" role="form">
 					<div class="margin-top-5"><input id="register-form-email" type="email" class="form-control" placeholder="email"></div>
 					<div class="margin-top-5"><input id="register-form-username" class="form-control" placeholder="username"></div>
@@ -48,15 +48,18 @@
 				</form>
 				<img class="close-icon" src="img/close_16.png" width="16" height="16" ng-click="sc.hideForm()">
 			</div>
-			<div class="form-container" ng-show="sc.formShowing && sc.formType === 'login'">
+			<div class="form-container" ng-show="sc.formShowing && sc.formType === 'login'" ng-cloak>
 				<form id="login-form" class="form-inline" role="form">
 					<div class="margin-top-5"><input id="login-form-username" class="form-control" placeholder="username"></div>
 					<div class="margin-top-5"><input id="login-form-password" class="form-control" type="password" placeholder="password"></div>
+					<div class="margin-top-5 center"><label>
+						<input type="checkbox" checked><span>&nbsp; remember me</span>
+					</label></div>
 					<div class="right margin-top-5"><button type="submit" class="btn btn-default">Log In</button></div>
 				</form>
 				<img class="close-icon" src="img/close_16.png" width="16" height="16" ng-click="sc.hideForm()">
 			</div>
-			<div class="shield" ng-show="sc.formShowing" ng-click="sc.hideForm()"></div>
+			<div class="shield" ng-show="sc.formShowing" ng-click="sc.hideForm()" ng-cloak></div>
 		</div>
 		
 		<div class="masterlist container-fluid">
@@ -84,8 +87,8 @@
 		</div>
 		
 		<div class="docs" ng-controller="DocsController as docs">
-			<div class="docs-title link" ng-click="docs.toggle()">{{docs.titleText}}</div>
-			<div class="docs-text margin-top-5" ng-show="docs.showing">
+			<div class="docs-title link" ng-cloak ng-click="docs.toggle()" ng-bind="docs.titleText"></div>
+			<div class="docs-text margin-top-5" ng-show="docs.showing" ng-cloak>
 				<p>To add to the "small" list, type <kbd>add "clean room" -s</kbd></p>
 				<p>Similarly, suffix your code with <kbd>-m</kbd> or <kbd>-l</kbd> to add to the "medium" and "large" lists</p>
 			</div>

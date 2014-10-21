@@ -24,5 +24,12 @@
 			this.logout = function() {				
 				window.location = 'php/logout.php';
 			};
+
+			/* --- Check if user is verifying account --- */
+			if (window.location.search.substr(0, 7) === '?token=') {
+				this.formShowing = true;
+				noty({type: 'success', timeout: 3000, text: 'Log in to complete verification!'});
+			}
+
 		});
 })();
