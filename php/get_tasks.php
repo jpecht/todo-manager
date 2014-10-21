@@ -17,7 +17,7 @@
 		array_push($tasks, array(
 			"task_id" => $row["id"],
 			"description" => $row["description"],
-			"list_name" => $row["list_name"],
+			"list_num" => $row["list_num"],
 			"date_created" => $row["date_created"]
 		));
 	}

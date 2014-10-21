@@ -9,11 +9,11 @@
 	
 	$user_id = $_REQUEST['user_id'];
 	$description = $_REQUEST['description'];
-	$list_name = $_REQUEST['list_name'];
+	$list_num = $_REQUEST['list_num'];
 	$date_created = date('Y-m-d H:i:s');
 	
-	$keys = '(user_id, description, list_name, date_created)';
-	$values = '(' . $user_id . ', "'. $description . '", "' . $list_name . '", "' . $date_created . '")';
+	$keys = '(user_id, description, list_num, date_created)';
+	$values = '(' . $user_id . ', "'. $description . '", "' . $list_num . '", "' . $date_created . '")';
 	$query = 'INSERT INTO tasks ' . $keys . ' VALUES ' . $values;
 	$result = mysqli_query($connection, $query);
 	

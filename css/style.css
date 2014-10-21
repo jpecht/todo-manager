@@ -54,7 +54,7 @@ header {
 }
 .block {
 	margin-top: 20px;
-	height: 200px;
+	min-height: 200px;
 	background-color: #E0E0E0;
 	box-shadow: 1px 1px 5px rgba(0,0,0,0.3);
 	-moz-box-shadow: 1px 1px 5px rgba(0,0,0,0.3);
@@ -69,6 +69,7 @@ header {
 	font-size: 1em;
 	text-align: center;
 	color: #777;
+	cursor: default;
 }
 .task {
 	margin: 5px 20px;

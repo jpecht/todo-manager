@@ -21,6 +21,10 @@
 				'user_id' => $user_id,
 				'username' => $user_obj['username'],
 				'email' => $user_obj['email'],
+				'list_name_1' => &user_obj['list_name_1'],
+				'list_name_2' => &user_obj['list_name_2'],
+				'list_name_3' => &user_obj['list_name_3'],
+				'list_name_4' => &user_obj['list_name_4'],
 				'status' => 'session id exists'
 			));
 		} else {
@@ -68,6 +72,10 @@
 						'user_id' => $user_id,
 						'username' => $user_array['username'],
 						'email' => $user_array['email'],
+						'list_name_1' => &user_obj['list_name_1'],
+						'list_name_2' => &user_obj['list_name_2'],
+						'list_name_3' => &user_obj['list_name_3'],
+						'list_name_4' => &user_obj['list_name_4'],
 						'status' => 'publickey cookie exists'
 					));
 				} else {

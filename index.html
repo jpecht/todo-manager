@@ -66,18 +66,18 @@
 		<div class="masterlist container-fluid">
 			<div class="row">
 				<div class="col-xs-12 col-sm-4">
-					<div class="block block-s">
-						<div class="block-title">small</div>
+					<div class="block block-1">
+						<div class="block-title" name="list-name-1"></div>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-4">
-					<div class="block block-m">
-						<div class="block-title">medium</div>
+					<div class="block block-2">
+						<div class="block-title" name="list-name-2"></div>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-4">
-					<div class="block block-l">
-						<div class="block-title">large</div>
+					<div class="block block-3">
+						<div class="block-title" name="list-name-3"></div>
 					</div>
 				</div>
 			</div>
@@ -90,8 +90,9 @@
 		<div class="docs" ng-controller="DocsController as docs">
 			<div class="docs-title link" ng-cloak ng-click="docs.toggle()" ng-bind="docs.titleText"></div>
 			<div class="docs-text margin-top-5" ng-show="docs.showing" ng-cloak>
-				<p>To add to the "small" list, type <kbd>add "clean room" -s</kbd></p>
-				<p>Similarly, suffix your code with <kbd>-m</kbd> or <kbd>-l</kbd> to add to the "medium" and "large" lists</p>
+				<p>To add a task, type <kbd>add "task description"</kbd> in the command line</p>
+				<p>By default, it will add to the first list.</p>
+				<p>To add to the second list, type <kbd>add "task" -2</kbd></p>
 			</div>
 		</div>
 		

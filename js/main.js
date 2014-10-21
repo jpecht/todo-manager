@@ -4,7 +4,11 @@ $.noty.defaults.timeout = 1500;
 $.noty.defaults.closeWith = ['click', 'button'];
 
 (function() {
-	var USR = {'logged_in': false}; // user information (username, email, etc.)
+	// user information (username, email, etc.)
+	var USR = {
+		logged_in: false,
+		num_lists: 3
+	};
 
 
 	/* --- Check for Returning User --- */
@@ -21,6 +25,12 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				scope.sc.buttonsShowing = false;
 			});
 			
+			// fill in list names
+			for (var i = 1; i <= USR.num_lists; i++) {
+				$('.block-title[name="list-name-' + i + '"]').html(USR['list_name_' + i]);
+			}
+			
+			// get tasks			
 			getTasks();
 		}
 	});
@@ -108,19 +118,17 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				return;
 			}
 			
-			// TODO write command line validation
-			var cmdStr = $('.cmdline').val();
-			var cmdIsValid = true;
-			
-			if (cmdIsValid) {
+			var cmd = parseCommand($('.cmdline').val());			
+			if (cmd.isValid) {
 				NProgress.start();
 				
-				var taskName = cmdStr.split('"')[1]; // TODO add support for single quotes
-				var listName = cmdStr.substr(cmdStr.indexOf('-') + 1, 1);
-				addTask(taskName, listName);
-
+				if (cmd.action === 'add') addTask(cmd.description, cmd.list);
+				else if (cmd.action === 'rename') renameList(cmd.description, cmd.list);
+				
 				$('.cmdline').val('');
 				NProgress.done();
+			} else {
+				
 			}
 		}
 	});
@@ -134,7 +142,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			
 		}).done(function(data) {
 			var tasks = $.parseJSON(data);
-			for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i].description, tasks[i].list_name);
+			for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i].description, tasks[i].list_num);
 		}).fail(function() {
 			console.log(data);
 			noty({type: 'warning', text: 'Failed to contact server'});
@@ -144,7 +152,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		$.post('php/add_task.php', {
 			user_id: USR.user_id,
 			description: task,
-			list_name: list
+			list_num: list
 		}).always(function() {
 			NProgress.done();
 		}).done(function(data) {
@@ -155,7 +163,70 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			noty({type: 'warning', text: 'Failed to contact server'});
 		});
 	};
-	var addTaskToDisplay = function(description, list_name) {
-		$('.block-' + list_name).append('<div class="task">' + description + '</div>');	
+	var addTaskToDisplay = function(description, list_num) {
+		$('.block-' + list_num).append('<div class="task">' + description + '</div>');	
+	};
+	var renameList = function(list_name, list_num) {
+		
+	};
+	
+	/* --- Command Validation --- */
+	var parseCommand = function(str) {
+		var cmd = {isValid: false};
+		
+		// determine action
+		if (str.indexOf(' ') === -1) return cmd;
+		var action = str.substr(0, str.indexOf(' '));
+		if (action === 'add' || action === 'rename') cmd.action = action;
+		else return cmd;
+		
+		// first check if quotes are being used
+		var singleQuote = "'", doubleQuote = '"';
+		var singleQuoteIndex = str.indexOf(singleQuote),
+			doubleQuoteIndex = str.indexOf(doubleQuote);
+			
+		if (singleQuoteIndex === -1 && doubleQuoteIndex === -1) {
+			var splitArr = str.split(' ');
+			if (splitArr.length === 2) {
+				// ex: "add clean"
+				cmd.isValid = true;
+				cmd.description = splitArr[1];
+				cmd.list = 1;
+			} else if (splitArr.length === 3) {
+				// ex: "add clean -1"
+				var list = parseListStr(splitArr[2]);
+				if (list.isValid) {
+					cmd.isValid = true;
+					cmd.description = splitArr[1];
+					cmd.list = list.list_num;
+				}
+			}
+		} else {
+			// determine which type of quote to use
+			var quote = singleQuote;
+			if (doubleQuoteIndex <= singleQuoteIndex) quote = doubleQuote;
+			
+			// split into the three parts: action, description, list
+			var splitByQuote = str.split(quote);
+			if (splitByQuote.length === 3) {
+				var list = parseListStr(splitByQuote[2].trim());
+				if (list.isValid) {
+					cmd.isValid = true;
+					cmd.description = splitByQuote[1];
+					cmd.list = list.list_num;
+				}
+			}				
+		}
+		return cmd;
+	};
+	var parseListStr = function(str) {
+		var list = {isValid: false};
+		if (str.length === 2) {
+			list.list_num = parseInt(str.substr(1, 1));
+			if (!isNaN(list.list_num) && list.list_num >= 1 && list.list_num <= USR.num_lists) {
+				list.isValid = true;
+			}
+		}
+		return list;
 	};
 })();
