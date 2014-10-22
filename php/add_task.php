@@ -12,10 +12,16 @@
 	$query = 'INSERT INTO tasks ' . $keys . ' VALUES ' . $values;
 	$result = mysqli_query($connection, $query);
 	
-	echo json_encode(array(
-		"task_id" => mysqli_insert_id($connection),
-		"date_created" => $date_created
-	));
+	if ($result) {
+		echo json_encode(array(
+			"task_id" => mysqli_insert_id($connection),
+			"date_created" => $date_created
+		));
+	} else {
+		echo json_encode(array(
+			"error" => "Query failed."
+		));
+	}
 	
 	mysqli_close($connection);
 ?>

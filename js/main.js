@@ -143,15 +143,15 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			$('.cmdline').val('');
 		}
 	});
-
-
+	
+	
 	/* --- Task Management --- */
 	// -------- tasks -------- //
 	var getTasks = function() {
 		$.post('php/get_tasks.php')
 			.done(function(data) {
 				var tasks = $.parseJSON(data);
-				for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i].description, tasks[i].list_num);
+				for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i].task_id, tasks[i].description, tasks[i].list_num);
 			})
 			.fail(failFunction);
 	};
@@ -163,12 +163,36 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		}).always(function() {
 			NProgress.done();
 		}).done(function(data) {
-			var taskObj = $.parseJSON(data);
-			addTaskToDisplay(task, list);
+			var response = $.parseJSON(data);
+			if (response.hasOwnProperty('error')) {
+				noty({type: 'warning', text: '<strong>Trouble adding task</strong><br/>' + response.error});
+			} else {
+				addTaskToDisplay(response.task_id, task, list);				
+			}
 		}).fail(failFunction);
 	};
-	var addTaskToDisplay = function(description, list_num) {
-		$('.block-' + list_num).append('<div class="task">' + description + '</div>');	
+	var addTaskToDisplay = function(task_id, description, list_num) {
+		var task = $('<div class="task" id="task-' + task_id + '">' + description + '</div>');
+		var task_close = $('<img class="task-close-icon" src="img/square_close_16.png" height="16" width="16">');
+		task.appendTo('.block-' + list_num);
+		task_close.appendTo(task)
+			.click(function() {
+				completeTask(task_id);
+			});
+	};
+	var completeTask = function(task_id) {
+		NProgress.start();
+		$.post('php/complete_task.php', {
+			task_id: task_id
+		}).done(function(data) {			
+			var response = $.parseJSON(data);
+			if (response.hasOwnProperty('error')) {
+				noty({type: 'warning', text: '<strong>Trouble with server completing task</strong><br/>' + response.error});
+			} else {
+				$('#task-' + task_id).remove();
+				NProgress.done();
+			}		
+		}).fail(failFunction);
 	};
 
 	// --------- lists ---------- //
@@ -276,6 +300,39 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		}
 		return list;
 	};
+
+
+	/* --- Angular Module --- */
+	var app = angular.module('Todo', [])
+		.controller('DocsController', function() {
+			this.showing = false;
+			this.titleText = 'show help';
+			
+			this.toggle = function() {
+				this.showing = !this.showing;
+				this.titleText = this.showing ? 'hide help' : 'show help';
+			};
+		}).controller('StatusController', function() {
+			this.buttonsShowing = true;
+			this.formShowing = false;
+			this.formType = 'login';
+			this.showForm = function(type) {
+				this.formShowing = true;
+				this.formType = type;
+			};
+			this.hideForm = function() {
+				this.formShowing = false;
+			};
+			this.logout = function() {				
+				window.location = 'php/logout.php';
+			};
+
+			/* --- Check if user is verifying account --- */
+			if (window.location.search.substr(0, 7) === '?token=') {
+				this.formShowing = true;
+				noty({type: 'success', timeout: 3000, text: 'Log in to complete verification!'});
+			}
+		});
 
 
 	/* --- Helper Functions --- */

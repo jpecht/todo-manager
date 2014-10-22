@@ -30,5 +30,9 @@
 				this.formShowing = true;
 				noty({type: 'success', timeout: 3000, text: 'Log in to complete verification!'});
 			}
+		}).controller('TaskController', function() {
+			this.completeTask = function() {
+				
+			};
 		});
 })();
