@@ -1,5 +1,5 @@
 <?php
-	require_once('config.php');
+	require_once('connect.php');
 	require('phpmailer/PHPMailerAutoload.php');
     session_start();
 	
@@ -7,12 +7,6 @@
 	$username = $_REQUEST['username'];
 	$passhash = $_REQUEST['passhash'];
 	$reg_date = date('Y-m-d H:i:s');
-
-    $connection = mysqli_connect(HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, DB_NAME);
-	if (mysqli_connect_errno()) {
-		echo json_encode(array('error' => 'Failed to connect to MySQL: ' . mysqli_connect_error()));
-		exit();
-	}
 
 	// check for existing email
 	$query = 'SELECT * FROM users WHERE email LIKE "' . $email . '"';

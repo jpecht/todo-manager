@@ -1,11 +1,5 @@
 <?php
-	require_once('config.php');	
-
-    $connection = mysqli_connect(HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, DB_NAME);
-	if (mysqli_connect_errno()) {
-		echo 'Failed to connect to MySQL: ' . mysqli_connect_error();
-		exit();
-	}
+	require_once('connect.php');		
 	
 	$username = $_REQUEST['username'];
 	$passhash = $_REQUEST['passhash'];

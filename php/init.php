@@ -7,18 +7,12 @@
 		// check to make sure useragent is the same
 		if (strcmp($_SESSION['user_agent'], $_SERVER['HTTP_USER_AGENT']) === 0) {
 			// open connection
-			require_once('config.php');
-		    $connection = mysqli_connect(HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, DB_NAME);
-			if (mysqli_connect_errno()) {
-				echo json_encode(array("error" => 'Failed to connect to MySQL: ' . mysqli_connect_error()));
-				exit();
-			}
+			require_once('connect.php');
 	
 			$user_query = 'SELECT * FROM users WHERE id = ' . $user_id;
 			$user_result = mysqli_query($connection, $user_query);
 			$user_obj = mysqli_fetch_array($user_result);
 			echo json_encode(array(
-				'user_id' => $user_id,
 				'username' => $user_obj['username'],
 				'email' => $user_obj['email'],
 				'list_name_1' => $user_obj['list_name_1'],
@@ -35,12 +29,7 @@
 		if (isset($_COOKIE['publickey']) && strlen($_COOKIE['publickey']) > 32) {
 
 			// open connection
-			require_once('config.php');
-		    $connection = mysqli_connect(HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, DB_NAME);
-			if (mysqli_connect_errno()) {
-				echo json_encode(array("error" => 'Failed to connect to MySQL: ' . mysqli_connect_error()));
-				exit();
-			}
+			require_once('connect.php');
 
 			$cookie = $_COOKIE['publickey'];
 			$user_id = (int)substr($cookie, 0, strlen($cookie) - 32);
@@ -55,8 +44,8 @@
 
 				// retrieve user's salt
 				$user_query = 'SELECT * FROM users WHERE id = ' . $user_id;
-				$user_array = mysqli_fetch_array(mysqli_query($connection, $user_query));
-				$salt = $user_array['salt'];
+				$user_obj = mysqli_fetch_array(mysqli_query($connection, $user_query));
+				$salt = $user_obj['salt'];
 
 				// reconstruct private key and compare to database
 				$private_key = md5($_SERVER['HTTP_USER_AGENT'] . $salt);
@@ -70,8 +59,8 @@
 
 					echo json_encode(array(
 						'user_id' => $user_id,
-						'username' => $user_array['username'],
-						'email' => $user_array['email'],
+						'username' => $user_obj['username'],
+						'email' => $user_obj['email'],
 						'list_name_1' => $user_obj['list_name_1'],
 						'list_name_2' => $user_obj['list_name_2'],
 						'list_name_3' => $user_obj['list_name_3'],

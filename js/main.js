@@ -24,16 +24,11 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			scope.$apply(function() {
 				scope.sc.buttonsShowing = false;
 			});
-			
-			// fill in list names
-			for (var i = 1; i <= USR.num_lists; i++) {
-				$('.block-title[name="list-name-' + i + '"]').html(USR['list_name_' + i]);
-			}
-			
-			// get tasks			
+						
+			fillListNames();
 			getTasks();
 		}
-	});
+	}).fail(failFunction);
 
 
 	/* --- Register --- */
@@ -66,10 +61,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			} else {
 				noty({type: 'warning', text: response.error});
 			}
-		}).fail(function(data) {
-			console.log('Error with register.php');
-			console.log(data);
-		});
+		}).fail(failFunction);
 	});
 	
 
@@ -93,9 +85,6 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			$('.login-container').hide();
 			NProgress.done();
 		}).done(function(data) {
-
-			console.log(data);
-
 			var response = $.parseJSON(data);
 			if (response.hasOwnProperty('error')) {
 				noty({type: 'warning', text: response.error, timeout: 3000});
@@ -103,10 +92,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				// on success: refresh page
 				window.location = './index.html';
 			}
-		}).fail(function(data) {
-			console.log(data);
-			noty({type: 'warning', text: 'Failed to contact server'});			
-		});
+		}).fail(failFunction);
 	});
 
 	
@@ -119,9 +105,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			}
 			
 			var cmd = parseCommand($('.cmdline').val());			
-			if (cmd.isValid) {
-				NProgress.start();
-				
+			if (cmd.isValid) {				
 				if (cmd.action === 'add') addTask(cmd.description, cmd.list);
 				else if (cmd.action === 'rename') renameList(cmd.description, cmd.list);
 				
@@ -138,22 +122,18 @@ $.noty.defaults.closeWith = ['click', 'button'];
 
 
 	/* --- Task Management --- */
+	// -------- tasks -------- //
 	var getTasks = function() {
-		$.post('php/get_tasks.php', {
-			user_id: USR.user_id
-		}).always(function() {
-			
-		}).done(function(data) {
-			var tasks = $.parseJSON(data);
-			for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i].description, tasks[i].list_num);
-		}).fail(function() {
-			console.log(data);
-			noty({type: 'warning', text: 'Failed to contact server'});
-		});
+		$.post('php/get_tasks.php')
+			.done(function(data) {
+				var tasks = $.parseJSON(data);
+				for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i].description, tasks[i].list_num);
+			})
+			.fail(failFunction);
 	};
-	var addTask = function(task, list) {		
+	var addTask = function(task, list) {
+		NProgress.start();		
 		$.post('php/add_task.php', {
-			user_id: USR.user_id,
 			description: task,
 			list_num: list
 		}).always(function() {
@@ -161,19 +141,30 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		}).done(function(data) {
 			var taskObj = $.parseJSON(data);
 			addTaskToDisplay(task, list);
-		}).fail(function(data) {
-			console.log(data);
-			noty({type: 'warning', text: 'Failed to contact server'});
-		});
+		}).fail(failFunction);
 	};
 	var addTaskToDisplay = function(description, list_num) {
 		$('.block-' + list_num).append('<div class="task">' + description + '</div>');	
 	};
+
+	// --------- lists ---------- //
+	var fillListName = function(num) {
+		$('.block-title[name="list-name-' + num + '"]').html(USR['list_name_' + num]);
+	}
+	var fillListNames = function() {
+		for (var i = 1; i <= USR.num_lists; i++) fillListName(i);
+	};
 	var renameList = function(list_name, list_num) {
-		NProgress.done();
+		NProgress.start();
 		$.post('php/rename_list.php', {
-			
-		});
+			list_name: list_name,
+			list_num: list_num
+		}).always(function() {
+			NProgress.done();
+		}).done(function() {
+			USR['list_name_'+list_num] = list_name;
+			fillListName(list_num);
+		}).fail(failFunction);
 	};
 	
 	/* --- Command Validation --- */
@@ -234,5 +225,12 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			}
 		}
 		return list;
+	};
+
+
+	/* --- Helper Functions --- */
+	var failFunction = function(data) {
+		console.log(data);
+		noty({type: 'warning', text: 'Failed to contact server'});
 	};
 })();

@@ -1,13 +1,8 @@
 <?php
-	require_once('config.php');
-
-    $connection = mysqli_connect(HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, DB_NAME);
-	if (mysqli_connect_errno()) {
-		echo 'Failed to connect to MySQL: ' . mysqli_connect_error();
-		exit();
-	}
+	require_once('connect.php');
+	session_start();
 	
-	$user_id = $_REQUEST['user_id'];
+	$user_id = $_SESSION['user_id'];
 	$description = $_REQUEST['description'];
 	$list_num = $_REQUEST['list_num'];
 	$date_created = date('Y-m-d H:i:s');
