@@ -145,8 +145,8 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	});
 	
 	
-	/* --- Task Management --- */
-	// -------- tasks -------- //
+	/* --- Task Manipulation --- */
+	// -------- tasks --------- //
 	var getTasks = function() {
 		$.post('php/get_tasks.php')
 			.done(function(data) {
@@ -172,7 +172,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		}).fail(failFunction);
 	};
 	var addTaskToDisplay = function(task_id, description, list_num) {
-		var task = $('<div class="task" id="task-' + task_id + '">' + description + '</div>');
+		var task = $('<li class="task" id="task-' + task_id + '">' + description + '</li>');
 		var task_close = $('<img class="task-close-icon" src="img/square_close_16.png" height="16" width="16">');
 		task.appendTo('.block-' + list_num);
 		task_close.appendTo(task)
@@ -301,6 +301,11 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		return list;
 	};
 
+
+	/* --- Initialize Task Sortability --- */
+	$('.block').sortable().disableSelection();
+	// need to include events
+	
 
 	/* --- Angular Module --- */
 	var app = angular.module('Todo', [])
