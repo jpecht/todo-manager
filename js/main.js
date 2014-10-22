@@ -12,7 +12,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 
 
 	/* --- Check for Returning User --- */
-	$.post('php/init.php').done(function(data) {		
+	$.post('php/init.php').done(function(data) {			
 		var response = $.parseJSON(data);		
 		if (!response.hasOwnProperty('error')) {
 			USR.logged_in = true;
@@ -105,10 +105,34 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			}
 			
 			var cmd = parseCommand($('.cmdline').val());			
-			if (cmd.isValid) {				
-				if (cmd.action === 'add') addTask(cmd.description, cmd.list);
-				else if (cmd.action === 'rename') renameList(cmd.description, cmd.list);
+			if (cmd.isValid) {
+				// if only given list name, find list num
+				if (!cmd.hasOwnProperty('list_num') && cmd.hasOwnProperty('list_name')) {
+					// for rename, switch the second and third word
+					if (cmd.action === 'rename') {
+						var oldListName = cmd.description;
+						var newListName = cmd.list_name;
+						cmd.list_name = oldListName;
+						cmd.description = newListName;
+					}
+					
+					var matched_list_name = false;
+					for (var i = 1; i <= USR.num_lists; i++) {
+						if (USR['list_name_' + i] === cmd.list_name) {
+							matched_list_name = true;
+							cmd.list_num = i;
+							break;
+						}
+					}
+					if (matched_list_name === false) {
+						noty({type: 'warning', text: '<strong>Invalid command!</strong><br/>List name does not match existing lists.'});
+						return;
+					}
+				}
 				
+				// execute action
+				if (cmd.action === 'add') addTask(cmd.description, cmd.list_num);
+				else if (cmd.action === 'rename') renameList(cmd.description, cmd.list_num);
 			} else {
 				if (cmd.error) {
 					noty({type: 'warning', text: '<strong>Invalid command!</strong><br/>' + cmd.error});	
@@ -150,7 +174,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	// --------- lists ---------- //
 	var fillListName = function(num) {
 		$('.block-title[name="list-name-' + num + '"]').html(USR['list_name_' + num]);
-	}
+	};
 	var fillListNames = function() {
 		for (var i = 1; i <= USR.num_lists; i++) fillListName(i);
 	};
@@ -161,9 +185,14 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			list_num: list_num
 		}).always(function() {
 			NProgress.done();
-		}).done(function() {
-			USR['list_name_'+list_num] = list_name;
-			fillListName(list_num);
+		}).done(function(data) {
+			var response = $.parseJSON(data);
+			if (response.hasOwnProperty('error')) {
+				noty({type: 'warning', text: '<strong>Trouble renaming list</strong><br/>' + response.error});
+			} else {
+				USR['list_name_'+list_num] = list_name;
+				fillListName(list_num);
+			}
 		}).fail(failFunction);
 	};
 	
@@ -172,10 +201,17 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		var cmd = {isValid: false};
 		
 		// determine action
-		if (str.indexOf(' ') === -1) return cmd;
+		if (str.indexOf(' ') === -1) {
+			cmd.error = 'No spaces T_T';
+			return cmd;
+		}
 		var action = str.substr(0, str.indexOf(' '));
-		if (action === 'add' || action === 'rename') cmd.action = action;
-		else return cmd;
+		if (action === 'add' || action === 'rename') {
+			cmd.action = action;
+		} else {
+			cmd.error = 'Unrecognizable action';
+			return cmd;
+		}
 		
 		// first check if quotes are being used
 		var singleQuote = "'", doubleQuote = '"';
@@ -183,38 +219,52 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			doubleQuoteIndex = str.indexOf(doubleQuote);
 			
 		if (singleQuoteIndex === -1 && doubleQuoteIndex === -1) {
+			// no quotes being used
 			var splitArr = str.split(' ');
 			if (splitArr.length === 2) {
 				// ex: "add clean"
 				cmd.isValid = true;
 				cmd.description = splitArr[1];
-				cmd.list = 1;
+				cmd.list_num = 1;
 			} else if (splitArr.length === 3) {
-				// ex: "add clean -1"
-				var list = parseListStr(splitArr[2]);
-				if (list.isValid) {
-					cmd.isValid = true;
-					cmd.description = splitArr[1];
-					cmd.list = list.list_num;
-				}
+				// ex: "add clean -1" or "rename small mysmall"
+				cmd = parseThreeParts(cmd, splitArr[1], splitArr[2]);				
+			} else {
+				cmd.error = 'Too many quotes or not enough quotes';
 			}
 		} else {
 			// determine which type of quote to use
 			var quote = singleQuote;
-			if (doubleQuoteIndex <= singleQuoteIndex) quote = doubleQuote;
+			if (singleQuoteIndex === -1 || (doubleQuoteIndex <= singleQuoteIndex && doubleQuoteIndex !== -1)) quote = doubleQuote;
 			
 			// split into the three parts: action, description, list
 			var splitByQuote = str.split(quote);
 			if (splitByQuote.length === 3) {
-				var list = parseListStr(splitByQuote[2].trim());
-				if (list.isValid) {
-					cmd.isValid = true;
-					cmd.description = splitByQuote[1];
-					cmd.list = list.list_num;
-				}
-			}				
+				// ex: "add 'clean' -2" or "rename 'mylist1' mylist2"
+				cmd = parseThreeParts(cmd, splitByQuote[1], splitByQuote[2].trim());
+			} else {
+				cmd.error = 'Problem with your quotes';
+			}
+			// TODO need to work in "rename 'mylist1' 'my list 1'"
 		}
 		return cmd;
+	};
+	var parseThreeParts = function(cmd, description, list) {
+		if (list.charAt(0) !== '-') {
+			cmd.isValid = true;
+			cmd.description = description;
+			cmd.list_name = list;
+		} else {
+			var listObj = parseListStr(list);
+			if (listObj.isValid) {
+				cmd.isValid = true;
+				cmd.description = description;
+				cmd.list_num = listObj.list_num;
+			} else {
+				cmd.error = 'Error with list specification';
+			}
+		}
+		return cmd;	
 	};
 	var parseListStr = function(str) {
 		var list = {isValid: false};
