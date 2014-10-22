@@ -40,7 +40,7 @@
 			$mail->Body = 'Thanks for signing up for To-Do Manager!<br/> Click <a href="' . $verification_link . '">here</a> to verify your account and log in!';
 			if (!$mail->send()) {
 				echo json_encode(array('error' => 'Trouble sending email'));
-				exit;
+				exit();
 			}
 
 			echo json_encode(array('success' => 'success'));

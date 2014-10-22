@@ -29,11 +29,11 @@
 							mysqli_query($connection, $alter_verify_query);
 						} else {
 							echo json_encode(array("error" => "Verification code does not match."));
-							exit;
+							exit();
 						}
 					} else {
 						echo json_encode(array("error" => "Must verify. No verification code."));
-						exit;
+						exit();
 					}
 				}
 
@@ -66,7 +66,7 @@
 				}
 				
 				echo json_encode(array("success" => "Success"));
-				exit;
+				exit();
 			} else {
 				echo json_encode(array("error" => "Incorrect password"));
 			}
