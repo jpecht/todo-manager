@@ -8,7 +8,7 @@
 		<meta name="description" content="">
 		<meta name="author" content="jpecht">
 
-		<meta name="viewport" content="width=device-width; initial-scale=1.0">
+		<!-- <meta name="viewport" content="width=device-width; initial-scale=1.0"> -->
 
 		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
 		<link rel="shortcut icon" href="/favicon.ico">
@@ -62,7 +62,6 @@
 				</form>
 				<img class="close-icon" src="img/close_16.png" width="16" height="16" ng-click="sc.hideForm()">
 			</div>
-			<div class="shield" ng-show="sc.formShowing" ng-click="sc.hideForm()" ng-cloak></div>
 		</div>
 		
 		<div class="masterlist container-fluid">
@@ -92,11 +91,14 @@
 		<div class="docs" ng-controller="DocsController as docs">
 			<div class="docs-title link" ng-cloak ng-click="docs.toggle()" ng-bind="docs.titleText"></div>
 			<div class="docs-text margin-top-5" ng-show="docs.showing" ng-cloak>
-				<p>To add a task, type <kbd>add "task description"</kbd> in the command line</p>
+				<p>To add a task, type <kbd>add "task"</kbd> in the command line</p>
 				<p>By default, it will add to the first list.</p>
-				<p>To add to the second list, type <kbd>add "task" -2</kbd></p>
+				<p>To add a task to the second list, type <kbd>add "task" -2</kbd> or <kbd>add "task" my_list_name</kbd></p>
+				<p>To rename a list, type <kbd>rename old_list_name new_list_name</kbd></p>
 			</div>
 		</div>
+
+		<div class="shield"></div>
 		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="lib/jquery-ui.min.js"></script>
