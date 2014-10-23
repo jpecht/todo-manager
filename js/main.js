@@ -221,7 +221,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	};
 	
 	/* --- Command Validation --- */
-	var parseCommand = function(str) {
+	parseCommand = function(str) {
 		var cmd = {isValid: false};
 		
 		// determine action
@@ -236,41 +236,39 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			cmd.error = 'Unrecognizable action';
 			return cmd;
 		}
-		
-		// first check if quotes are being used
+
+		// split string into action, description, list
+		var splitArr = [];
 		var singleQuote = "'", doubleQuote = '"';
 		var singleQuoteIndex = str.indexOf(singleQuote),
-			doubleQuoteIndex = str.indexOf(doubleQuote);
-			
+			doubleQuoteIndex = str.indexOf(doubleQuote);			
 		if (singleQuoteIndex === -1 && doubleQuoteIndex === -1) {
 			// no quotes being used
-			var splitArr = str.split(' ');
-			if (splitArr.length === 2) {
-				// ex: "add clean"
-				cmd.isValid = true;
-				cmd.description = splitArr[1];
-				cmd.list_num = 1;
-			} else if (splitArr.length === 3) {
-				// ex: "add clean -1" or "rename small mysmall"
-				cmd = parseThreeParts(cmd, splitArr[1], splitArr[2]);				
-			} else {
-				cmd.error = 'Too many quotes or not enough quotes';
-			}
+			splitArr = str.split(' ');
 		} else {
-			// determine which type of quote to use
-			var quote = singleQuote;
-			if (singleQuoteIndex === -1 || (doubleQuoteIndex <= singleQuoteIndex && doubleQuoteIndex !== -1)) quote = doubleQuote;
-			
-			// split into the three parts: action, description, list
-			var splitByQuote = str.split(quote);
-			if (splitByQuote.length === 3) {
-				// ex: "add 'clean' -2" or "rename 'mylist1' mylist2"
-				cmd = parseThreeParts(cmd, splitByQuote[1], splitByQuote[2].trim());
+			if (singleQuoteIndex === -1 || (doubleQuoteIndex <= singleQuoteIndex && doubleQuoteIndex !== -1)) {
+				// double quote being used
+				splitArr = str.match(/(?:[^\s"]+|"[^"]*")+/g);
 			} else {
-				cmd.error = 'Problem with your quotes';
+				// single quote being used
+				splitArr = str.match(/(?:[^\s']+|'[^']*')+/g);
 			}
-			// TODO need to work in "rename 'mylist1' 'my list 1'"
+			// remove quotes
+			for (var i = 0; i < splitArr.length; i++) splitArr[i] = splitArr[i].replace(/['"]+/g, '');
 		}
+
+		if (splitArr.length === 2) {
+			// ex: "add clean"
+			cmd.isValid = true;
+			cmd.description = splitArr[1];
+			cmd.list_num = 1;
+		} else if (splitArr.length === 3) {
+			// ex: "add clean -1" or "rename small mysmall"
+			cmd = parseThreeParts(cmd, splitArr[1], splitArr[2]);				
+		} else {
+			cmd.error = 'Too many words or too few words';
+		}
+
 		return cmd;
 	};
 	var parseThreeParts = function(cmd, description, list) {
