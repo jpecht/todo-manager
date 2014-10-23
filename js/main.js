@@ -131,8 +131,8 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				}
 				
 				// execute action
-				if (cmd.action === 'add') addTask(cmd.description, cmd.list_num);
-				else if (cmd.action === 'rename') renameList(cmd.description, cmd.list_num);
+				if (cmd.action === 'add') addTask(cmd.description, cmd.list_num, cmd.options);
+				else if (cmd.action === 'rename') renameList(cmd.description, cmd.list_num, cmd.options);
 			} else {
 				if (cmd.error) {
 					noty({type: 'warning', text: '<strong>Invalid command!</strong><br/>' + cmd.error});	
@@ -155,8 +155,8 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			})
 			.fail(failFunction);
 	};
-	var addTask = function(task, list) {
-		NProgress.start();		
+	var addTask = function(task, list, opts) {
+		NProgress.start();
 		$.post('php/add_task.php', {
 			description: task,
 			list_num: list
@@ -202,7 +202,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	var fillListNames = function() {
 		for (var i = 1; i <= USR.num_lists; i++) fillListName(i);
 	};
-	var renameList = function(list_name, list_num) {
+	var renameList = function(list_name, list_num, opts) {
 		NProgress.start();
 		$.post('php/rename_list.php', {
 			list_name: list_name,
@@ -221,8 +221,11 @@ $.noty.defaults.closeWith = ['click', 'button'];
 	};
 	
 	/* --- Command Validation --- */
-	parseCommand = function(str) {
-		var cmd = {isValid: false};
+	var parseCommand = function(str) {
+		var cmd = {
+			isValid: false,
+			options: {}
+		};
 		
 		// determine action
 		if (str.indexOf(' ') === -1) {
@@ -262,11 +265,17 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			cmd.isValid = true;
 			cmd.description = splitArr[1];
 			cmd.list_num = 1;
-		} else if (splitArr.length === 3) {
+		} else if (splitArr.length >= 3) {
 			// ex: "add clean -1" or "rename small mysmall"
-			cmd = parseThreeParts(cmd, splitArr[1], splitArr[2]);				
-		} else {
-			cmd.error = 'Too many words or too few words';
+			cmd = parseThreeParts(cmd, splitArr[1], splitArr[2]);
+			
+			if (splitArr.length > 3) {
+				for (var j = 3; j < splitArr.length; j++) {
+					var optionArr = splitArr[j].split(':');
+					if (optionArr.length != 2) return cmd;
+					else cmd.options[optionArr[0]] = optionArr[1];
+				}
+			}				
 		}
 
 		return cmd;
