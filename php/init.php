@@ -15,6 +15,7 @@
 			echo json_encode(array(
 				'username' => $user_obj['username'],
 				'email' => $user_obj['email'],
+				'color_scheme' => $user_obj['color_scheme'],
 				'list_name_1' => $user_obj['list_name_1'],
 				'list_name_2' => $user_obj['list_name_2'],
 				'list_name_3' => $user_obj['list_name_3'],
@@ -61,6 +62,7 @@
 						'user_id' => $user_id,
 						'username' => $user_obj['username'],
 						'email' => $user_obj['email'],
+						'color_scheme' => $user_obj['color_scheme'],
 						'list_name_1' => $user_obj['list_name_1'],
 						'list_name_2' => $user_obj['list_name_2'],
 						'list_name_3' => $user_obj['list_name_3'],

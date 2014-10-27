@@ -2,6 +2,7 @@
 /* --- Overall Layout --- */
 body {
 	font-family: 'Open Sans', sans-serif;
+	background-color: white;
 	color: #333;
 	padding-bottom: 20px;
 }
@@ -87,6 +88,7 @@ ul {
 	position: relative;
 	margin: 5px 20px;
 	padding: 5px 35px 5px 20px;
+	color: #333;
 	background-color: white;
 	box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 	border-radius: 10px;

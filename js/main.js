@@ -3,6 +3,22 @@ $.noty.defaults.killer = true;
 $.noty.defaults.timeout = 1500;
 $.noty.defaults.closeWith = ['click', 'button'];
 
+// colors!
+var color_schemes = {
+	light: {
+		color: '#333333',
+		background_color: '#FFFFFF',
+		color_task_complete: '#5EC85E'
+	},
+	dark: {
+		color: '#EEEEEE',
+		background_color: '#272b30',
+		color_task_complete: '#5EC85E'
+	}
+};
+color_schemes.default = color_schemes.light;
+
+
 (function() {
 	// user information (username, email, etc.)
 	var USR = {
@@ -10,9 +26,6 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		num_lists: 3
 	};
 	
-	// colors!
-	var color_task_complete = '#5EC85E';
-
 
 	/* --- Check for Returning User --- */
 	$.post('php/init.php').done(function(data) {			
@@ -27,7 +40,8 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			scope.$apply(function() {
 				scope.sc.buttonsShowing = false;
 			});
-						
+			
+			applyColorScheme();
 			fillListNames();
 			getTasks();
 		}
@@ -111,8 +125,8 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			if (cmd.isValid) {
 				// if only given list name, find list num
 				if (!cmd.hasOwnProperty('list_num') && cmd.hasOwnProperty('list_name')) {
-					// for rename, switch the second and third word
 					if (cmd.action === 'rename') {
+						// for rename, switch the second and third word
 						var oldListName = cmd.description;
 						var newListName = cmd.list_name;
 						cmd.list_name = oldListName;
@@ -136,6 +150,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				// execute action
 				if (cmd.action === 'add') addTask(cmd.description, cmd.list_num, cmd.options);
 				else if (cmd.action === 'rename') renameList(cmd.description, cmd.list_num, cmd.options);
+				else if (cmd.action === 'scheme') changeColorScheme(cmd.description);
 			} else {
 				if (cmd.error) {
 					noty({type: 'warning', text: '<strong>Invalid command!</strong><br/>' + cmd.error});	
@@ -155,7 +170,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			.done(function(data) {
 				var tasks = $.parseJSON(data);
 				tasks.sort(function(a, b) {
-					return a.order_id - b.order_id;
+					return +a.order_id - +b.order_id;
 				});
 				for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i]);
 			})
@@ -204,7 +219,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 				var task_element = $('#task-' + task_id);
 				task_element.animate({
 					color: 'white',
-					backgroundColor: color_task_complete
+					backgroundColor: color_schemes[USR.color_scheme].color_task_complete
 				}, 300, 'linear', function() {
 					setTimeout(function() {
 						task_element.animate({
@@ -257,7 +272,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			return cmd;
 		}
 		var action = str.substr(0, str.indexOf(' '));
-		if (action === 'add' || action === 'rename') {
+		if (action === 'add' || action === 'rename' || action === 'scheme') {
 			cmd.action = action;
 		} else {
 			cmd.error = 'Unrecognizable action';
@@ -286,11 +301,23 @@ $.noty.defaults.closeWith = ['click', 'button'];
 
 		if (splitArr.length === 2) {
 			// ex: "add clean"
+			
+			if (action === 'scheme' && !color_schemes.hasOwnProperty(splitArr[1])) {
+				cmd.error = 'Color scheme not found';
+				return cmd;				
+			}
+			
 			cmd.isValid = true;
 			cmd.description = splitArr[1];
 			cmd.list_num = 1;
 		} else if (splitArr.length >= 3) {
 			// ex: "add clean -1" or "rename small mysmall"
+			
+			if (action === 'scheme') {
+				cmd.error = 'Too many arguments given';
+				return cmd;
+			}
+			
 			cmd = parseComponents(cmd, splitArr[1], splitArr[2]);
 			
 			if (splitArr.length > 3) {
@@ -330,6 +357,27 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			}
 		}
 		return list;
+	};
+	
+	
+	/* --- Color Scheme --- */
+	var applyColorScheme = function() {
+		var current_scheme = color_schemes[USR.color_scheme];
+		$(document.body)
+			.css('background-color', current_scheme.background_color)
+			.css('color', current_scheme.color);		
+	};
+	var changeColorScheme = function(scheme) {
+		$.post('php/change_color_scheme.php', {
+			color_scheme: scheme
+		}, function(data) {
+			var response = $.parseJSON(data);
+			if (response.hasOwnProperty('error')) noty({type: 'warning', text: response.error});
+			else {
+				USR.color_scheme = scheme;
+				applyColorScheme();
+			}
+		});
 	};
 
 
