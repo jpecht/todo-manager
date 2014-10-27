@@ -219,8 +219,9 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			}
 		}).fail(failFunction);
 	};
+
 	
-	/* --- Command Validation --- */
+	/* --- Command Line Validation --- */
 	var parseCommand = function(str) {
 		var cmd = {
 			isValid: false,
@@ -267,7 +268,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			cmd.list_num = 1;
 		} else if (splitArr.length >= 3) {
 			// ex: "add clean -1" or "rename small mysmall"
-			cmd = parseThreeParts(cmd, splitArr[1], splitArr[2]);
+			cmd = parseComponents(cmd, splitArr[1], splitArr[2]);
 			
 			if (splitArr.length > 3) {
 				for (var j = 3; j < splitArr.length; j++) {
@@ -280,7 +281,7 @@ $.noty.defaults.closeWith = ['click', 'button'];
 
 		return cmd;
 	};
-	var parseThreeParts = function(cmd, description, list) {
+	var parseComponents = function(cmd, description, list) {
 		if (list.charAt(0) !== '-') {
 			cmd.isValid = true;
 			cmd.description = description;
