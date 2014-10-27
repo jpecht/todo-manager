@@ -33,7 +33,7 @@ ul {
 	font-size: 1em;
 	z-index: 30;
 }
-.logged-in-text { color: green; }
+.logged-in-text { color: #008000; }
 .logout-link { color: #E07373; }
 .form-container {
 	position: absolute;
@@ -96,8 +96,8 @@ ul {
 	cursor: default;
 }
 .task:hover {
-	background-color: #AAB1CF;
-	color: white;
+	background-color: #808080;
+	color: #FFFFFF;
 	box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
 }
 .task-close-icon {

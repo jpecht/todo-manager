@@ -8,11 +8,13 @@ var color_schemes = {
 	light: {
 		color: '#333333',
 		background_color: '#FFFFFF',
+		color_logged_in_text: '#008000',
 		color_task_complete: '#5EC85E'
 	},
 	dark: {
 		color: '#EEEEEE',
 		background_color: '#272b30',
+		color_logged_in_text: '#5EC85E',
 		color_task_complete: '#5EC85E'
 	}
 };
@@ -238,8 +240,8 @@ color_schemes.default = color_schemes.light;
 		var task_close = $('<img class="task-close-icon" src="img/square_close_16.png" height="16" width="16">');
 		task.appendTo('.block-' + taskObj.list_num)
 			.attr('id', 'task-' + taskObj.task_id)
-			.attr('task_id', taskObj.task_id)
-			.attr('order_id', taskObj.order_id);
+			.attr('task-id', taskObj.task_id)
+			.attr('order-id', taskObj.order_id);
 		task_close.appendTo(task)
 			.click(function() {
 				completeTask(taskObj.task_id);
@@ -406,7 +408,9 @@ color_schemes.default = color_schemes.light;
 		var current_scheme = color_schemes[USR.color_scheme];
 		$(document.body)
 			.css('background-color', current_scheme.background_color)
-			.css('color', current_scheme.color);		
+			.css('color', current_scheme.color);
+		$('.logged-in-text')
+			.css('color', current_scheme.color_logged_in_text);	
 	};
 	var changeColorScheme = function(scheme) {
 		$.post('php/change_color_scheme.php', {
@@ -424,10 +428,12 @@ color_schemes.default = color_schemes.light;
 
 	/* --- Initialize Task Sortability --- */
 	$('.block').sortable({
+		connectWith: '.block',
 		update: function(evt, ui) {
+			// reordering task within list
 			var new_order_id,
-				prev_order_id = +ui.item.prev().attr('order_id');
-				next_order_id = +ui.item.next().attr('order_id');
+				prev_order_id = +ui.item.prev().attr('order-id');
+				next_order_id = +ui.item.next().attr('order-id');
 
 			if (isNaN(prev_order_id)) {
 				new_order_id = next_order_id / 2;
@@ -440,12 +446,23 @@ color_schemes.default = color_schemes.light;
 			// change order in database
 			$.post('php/change_task_order.php', {
 				order_id: new_order_id,
-				task_id: ui.item.attr('task_id')
+				task_id: ui.item.attr('task-id')
 			}, function(data) {
 				var response = $.parseJSON(data);
+				if (response.hasOwnProperty('error')) noty({type: 'warning', text: response.error});
 			});
 
-			ui.item.attr('order_id', new_order_id);
+			ui.item.attr('order-id', new_order_id);
+		},
+		receive: function(evt, ui) {
+			// moving task to another list (update gets fired twice as well)
+			$.post('php/change_list.php', {
+				task_id: ui.item.attr('task-id'),
+				list_num: $(evt.target).attr('block-id')
+			}, function(data) {
+				var response = $.parseJSON(data);
+				if (response.hasOwnProperty('error')) noty({type: 'warning', text: response.error});
+			});
 		}
 	});
 
