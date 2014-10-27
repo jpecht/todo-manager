@@ -26,6 +26,11 @@ color_schemes.default = color_schemes.light;
 		num_lists: 3
 	};
 	
+	// command line variables
+	var cmd_history = [],
+		cmd_history_index = -1,
+		cmd_history_search_type = 'basic';
+	
 
 	/* --- Check for Returning User --- */
 	$.post('php/init.php').done(function(data) {			
@@ -114,14 +119,46 @@ color_schemes.default = color_schemes.light;
 
 	
 	/* --- Command Line Input --- */
-	$('.cmdline').on('keypress', function(evt) {
+	$('.cmdline').on('keyup', function(evt) {
+		var cmd_str = $('.cmdline').val().trim();
+		
+		// command history (up arrow)
+		if (evt.which === 38) {
+			if (cmd_history.length > 0 && cmd_history_index >= 0) {
+				if (cmd_history_search_type !== 'match' && ((cmd_history_index === cmd_history.length - 1 && cmd_str === '') || (cmd_str === cmd_history[cmd_history_index + 1]))) {
+					// going through command line history
+					cmd_history_search_type = 'basic';
+					$('.cmdline').val(cmd_history[cmd_history_index]);
+					cmd_history_index--;			
+				} else {
+					// matching current string with history
+					if (cmd_history_search_type !== 'match') {
+						cmd_history_search_type = 'match';
+						cmd_history_index = cmd_history.length - 1;
+					}
+					
+					for (var i = cmd_history_index; i >= 0; i--) {
+						if (cmd_history[i].substr(0, cmd_str.length) === cmd_str) {
+							$('.cmdline').val(cmd_history[i]);
+							cmd_history_index = i - 1; 
+							break;
+						}
+					}
+				}
+			}
+		} else {
+			cmd_history_search_type = 'basic';
+			cmd_history_index = cmd_history.length - 1;
+		}
+
+		// command submittal (enter)
 		if (evt.which === 13) {
 			if (!USR.logged_in) {
 				noty({type: 'warning', text: 'Log in first!'});				
 				return;
 			}
 			
-			var cmd = parseCommand($('.cmdline').val());			
+			var cmd = parseCommand(cmd_str);			
 			if (cmd.isValid) {
 				// if only given list name, find list num
 				if (!cmd.hasOwnProperty('list_num') && cmd.hasOwnProperty('list_name')) {
@@ -158,6 +195,10 @@ color_schemes.default = color_schemes.light;
 					noty({type: 'warning', text: '<strong>Invalid command!</strong><br/>Look at the docs below for clarification.'});
 				}
 			}
+			
+			// store in history and empty
+			cmd_history.push(cmd_str);
+			cmd_history_index = cmd_history.length - 1;
 			$('.cmdline').val('');
 		}
 	});
