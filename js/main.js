@@ -9,6 +9,9 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		logged_in: false,
 		num_lists: 3
 	};
+	
+	// colors!
+	var color_task_complete = '#5EC85E';
 
 
 	/* --- Check for Returning User --- */
@@ -195,8 +198,22 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			if (response.hasOwnProperty('error')) {
 				noty({type: 'warning', text: '<strong>Trouble with server completing task</strong><br/>' + response.error});
 			} else {
-				$('#task-' + task_id).remove();
+				// animate task out then disappear
 				NProgress.done();
+				
+				var task_element = $('#task-' + task_id);
+				task_element.animate({
+					color: 'white',
+					backgroundColor: color_task_complete
+				}, 300, 'linear', function() {
+					setTimeout(function() {
+						task_element.animate({
+							opacity: 0
+						}, 300, 'linear', function() {
+							task_element.remove();
+						});
+					}, 200);
+				});
 			}		
 		}).fail(failFunction);
 	};

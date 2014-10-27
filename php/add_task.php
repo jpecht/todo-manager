@@ -17,9 +17,6 @@
 	$keys = '(user_id, description, list_num, date_created, order_id)';
 	$values = '(' . $user_id . ', "'. $description . '", "' . $list_num . '", "' . $date_created . '", ' . $new_max_id . ')';
 	$query = 'INSERT INTO tasks ' . $keys . ' VALUES ' . $values;
-
-	echo($query);
-
 	$result = mysqli_query($connection, $query);
 	
 	if ($result) {
