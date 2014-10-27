@@ -12,11 +12,11 @@
 				
 				// TODO scroll down when showing help
 				// doesnt work right now because of delay for angular to show '.docs-text'
-				var currScrollTop = $(document.body).scrollTop();
+				/*var currScrollTop = $(document.body).scrollTop();
 				console.log(currScrollTop);
 				console.log($('.docs-text').height());
 				if (this.showing) $(document.body).scrollTop(currScrollTop + $('.docs-text').height());
-				console.log($(document.body).scrollTop());
+				console.log($(document.body).scrollTop());*/
 			};
 		}).controller('StatusController', function() {
 			this.buttonsShowing = true;

@@ -11,7 +11,8 @@
 			"task_id" => $row["id"],
 			"description" => $row["description"],
 			"list_num" => $row["list_num"],
-			"date_created" => $row["date_created"]
+			"date_created" => $row["date_created"],
+			"order_id" => $row["order_id"]
 		));
 	}
 		

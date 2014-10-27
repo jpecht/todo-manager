@@ -151,7 +151,10 @@ $.noty.defaults.closeWith = ['click', 'button'];
 		$.post('php/get_tasks.php')
 			.done(function(data) {
 				var tasks = $.parseJSON(data);
-				for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i].task_id, tasks[i].description, tasks[i].list_num);
+				tasks.sort(function(a, b) {
+					return a.order_id - b.order_id;
+				});
+				for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i]);
 			})
 			.fail(failFunction);
 	};
@@ -167,17 +170,20 @@ $.noty.defaults.closeWith = ['click', 'button'];
 			if (response.hasOwnProperty('error')) {
 				noty({type: 'warning', text: '<strong>Trouble adding task</strong><br/>' + response.error});
 			} else {
-				addTaskToDisplay(response.task_id, task, list);				
+				addTaskToDisplay(response);				
 			}
 		}).fail(failFunction);
 	};
-	var addTaskToDisplay = function(task_id, description, list_num) {
-		var task = $('<li class="task" id="task-' + task_id + '">' + description + '</li>');
+	var addTaskToDisplay = function(taskObj) {
+		var task = $('<li class="task">' + taskObj.description + '</li>');
 		var task_close = $('<img class="task-close-icon" src="img/square_close_16.png" height="16" width="16">');
-		task.appendTo('.block-' + list_num);
+		task.appendTo('.block-' + taskObj.list_num)
+			.attr('id', 'task-' + taskObj.task_id)
+			.attr('task_id', taskObj.task_id)
+			.attr('order_id', taskObj.order_id);
 		task_close.appendTo(task)
 			.click(function() {
-				completeTask(task_id);
+				completeTask(taskObj.task_id);
 			});
 	};
 	var completeTask = function(task_id) {
@@ -311,10 +317,34 @@ $.noty.defaults.closeWith = ['click', 'button'];
 
 
 	/* --- Initialize Task Sortability --- */
-	$('.block').sortable().disableSelection();
-	// need to include events
+	$('.block').sortable({
+		update: function(evt, ui) {
+			var new_order_id,
+				prev_order_id = +ui.item.prev().attr('order_id');
+				next_order_id = +ui.item.next().attr('order_id');
 
-	// Shield //
+			if (isNaN(prev_order_id)) {
+				new_order_id = next_order_id / 2;
+			} else if (isNaN(next_order_id)) {
+				new_order_id = prev_order_id + 1000;
+			} else {
+				new_order_id = prev_order_id + (next_order_id - prev_order_id) / 2;
+			}
+
+			// change order in database
+			$.post('php/change_task_order.php', {
+				order_id: new_order_id,
+				task_id: ui.item.attr('task_id')
+			}, function(data) {
+				var response = $.parseJSON(data);
+			});
+
+			ui.item.attr('order_id', new_order_id);
+		}
+	});
+
+
+	// --- Shield --- //
 	$('.shield').click(function() {
 		var scope = angular.element($('.status-overlay')).scope();
 		scope.$apply(function() { scope.sc.hideForm(); });		
