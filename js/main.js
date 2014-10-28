@@ -8,14 +8,16 @@ var color_schemes = {
 	light: {
 		color: '#333333',
 		background_color: '#FFFFFF',
-		color_logged_in_text: '#008000',
-		color_task_complete: '#5EC85E'
+		color_task_hover: '#B0A593', // not implemented
+		color_task_complete: '#5EC85E', // not implemented
+		color_logged_in_text: '#008000'
 	},
 	dark: {
-		color: '#EEEEEE',
-		background_color: '#272b30',
-		color_logged_in_text: '#5EC85E',
-		color_task_complete: '#5EC85E'
+		color: '#FFFFFF',
+		background_color: '#272B30', // main primary
+		color_task_hover: '#808080',
+		color_task_complete: '#86977E', // light secondary
+		color_logged_in_text: '#5EC85E'
 	}
 };
 color_schemes.default = color_schemes.light;
@@ -410,12 +412,15 @@ color_schemes.default = color_schemes.light;
 			.css('background-color', current_scheme.background_color)
 			.css('color', current_scheme.color);
 		$('.logged-in-text')
-			.css('color', current_scheme.color_logged_in_text);	
+			.css('color', current_scheme.color_logged_in_text);
 	};
 	var changeColorScheme = function(scheme) {
+		NProgress.start();
 		$.post('php/change_color_scheme.php', {
 			color_scheme: scheme
-		}, function(data) {
+		}).always(function(data) {
+			NProgress.done();
+		}).done(function(data) {
 			var response = $.parseJSON(data);
 			if (response.hasOwnProperty('error')) noty({type: 'warning', text: response.error});
 			else {
