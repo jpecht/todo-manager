@@ -68,17 +68,20 @@
 			<div class="row">
 				<div class="col-xs-12 col-sm-4">
 					<ul class="block block-1" block-id="1">
-						<div class="block-title" name="list-name-1"></div>
+						<div class="block-title" name="list-name-1">small</div>
+						<div class="block-completed-link link" block-id="1">show completed</div>
 					</ul>
 				</div>
 				<div class="col-xs-12 col-sm-4">
 					<ul class="block block-2" block-id="2">
-						<div class="block-title" name="list-name-2"></div>
+						<div class="block-title" name="list-name-2">medium</div>
+						<div class="block-completed-link link" block-id="2">show completed</div>
 					</ul>
 				</div>
 				<div class="col-xs-12 col-sm-4">
 					<ul class="block block-3" block-id="3">
-						<div class="block-title" name="list-name-3"></div>
+						<div class="block-title" name="list-name-3">large</div>
+						<div class="block-completed-link link" block-id="3">show completed</div>
 					</ul>
 				</div>
 			</div>
@@ -91,12 +94,10 @@
 		<div class="docs" ng-controller="DocsController as docs">
 			<div class="docs-title link" ng-cloak ng-click="docs.toggle()" ng-bind="docs.titleText"></div>
 			<div class="docs-text margin-top-5" ng-show="docs.showing" ng-cloak>
-				<p>To add a task, type <kbd>add "task"</kbd> in the command line</p>
-				<p>By default, it will add to the first list.</p>
+				<p>To add a task, type <kbd>add "task"</kbd> in the command line. By default, it will add to the first list.</p>
 				<p>To add a task to the second list, type <kbd>add "task" -2</kbd> or <kbd>add "task" my_list_name</kbd></p>
 				<p>To rename a list, type <kbd>rename old_list_name new_list_name</kbd></p>
-				<p>To change color scheme, type <kbd>scheme my_scheme</kbd></p>
-				<p>Available schemes: light, dark</p>
+				<p>To change color scheme, type <kbd>scheme my_scheme</kbd> (available schemes: light, dark)</p>
 			</div>
 		</div>
 

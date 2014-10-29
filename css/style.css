@@ -66,9 +66,11 @@ ul {
 	z-index: 20;
 }
 .block {
+	position: relative;
 	margin-top: 20px;
-	padding-bottom: 10px;
+	padding-bottom: 30px;
 	min-height: 200px;
+	color: #777;
 	background-color: #E0E0E0;
 	box-shadow: 1px 1px 5px rgba(0,0,0,0.3);
 	-moz-box-shadow: 1px 1px 5px rgba(0,0,0,0.3);
@@ -82,8 +84,14 @@ ul {
 	padding: 5px;
 	font-size: 1em;
 	text-align: center;
-	color: #777;
 	cursor: default;
+}
+.block-completed-link {
+	position: absolute;
+	width: 100%;
+	bottom: 5px;
+	text-align: center;
+	font-size: 0.9em;
 }
 .task {
 	position: relative;
@@ -96,8 +104,8 @@ ul {
 	cursor: default;
 }
 .task:hover {
-	background-color: #808080;
-	color: #FFFFFF;
+	/*background-color: #9BC2CF;
+	color: #FFFFFF;*/
 	box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
 }
 .task-close-icon {

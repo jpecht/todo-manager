@@ -4,6 +4,8 @@ $.noty.defaults.timeout = 1500;
 $.noty.defaults.closeWith = ['click', 'button'];
 
 // colors!
+var task_colors = ['#FFFFFF', '#AEC7E8', '#FFBB78', '#98DF8A', '#FF9896', '#C5B0D5', '#C49C94', '#F7B6D2', '#C7C7C7'];
+var task_hover_colors = ['#DDDDDD', '#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B', '#E377C2', '#7F7F7F'];
 var color_schemes = {
 	light: {
 		color: '#333333',
@@ -37,24 +39,27 @@ color_schemes.default = color_schemes.light;
 	
 
 	/* --- Check for Returning User --- */
-	$.post('php/init.php').done(function(data) {			
-		var response = $.parseJSON(data);		
-		if (!response.hasOwnProperty('error')) {
-			USR.logged_in = true;
-			for (var ind in response) USR[ind] = response[ind];			
-
-			// hide buttons and show logged in text
-			$('.logged-in-text').html('logged in as ' + USR.username);
-			var scope = angular.element($('.status-overlay')).scope();
-			scope.$apply(function() {
-				scope.sc.buttonsShowing = false;
-			});
-			
-			applyColorScheme();
-			fillListNames();
-			getTasks();
-		}
-	}).fail(failFunction);
+	NProgress.start();		
+	$.post('php/init.php')
+		.always(function() { NProgress.done(); })
+		.done(function(data) {
+			var response = $.parseJSON(data);		
+			if (!response.hasOwnProperty('error')) {
+				USR.logged_in = true;
+				for (var ind in response) USR[ind] = response[ind];			
+	
+				// hide buttons and show logged in text
+				$('.logged-in-text').html('logged in as ' + USR.username);
+				var scope = angular.element($('.status-overlay')).scope();
+				scope.$apply(function() {
+					scope.sc.buttonsShowing = false;
+				});
+				
+				applyColorScheme();
+				fillListNames();
+				getTasks();
+			}
+		}).fail(failFunction);
 
 
 	/* --- Register --- */
@@ -233,7 +238,7 @@ color_schemes.default = color_schemes.light;
 			if (response.hasOwnProperty('error')) {
 				noty({type: 'warning', text: '<strong>Trouble adding task</strong><br/>' + response.error});
 			} else {
-				addTaskToDisplay(response);				
+				addTaskToDisplay(response);
 			}
 		}).fail(failFunction);
 	};
@@ -243,7 +248,20 @@ color_schemes.default = color_schemes.light;
 		task.appendTo('.block-' + taskObj.list_num)
 			.attr('id', 'task-' + taskObj.task_id)
 			.attr('task-id', taskObj.task_id)
-			.attr('order-id', taskObj.order_id);
+			.attr('order-id', taskObj.order_id)
+			.attr('color-id', taskObj.color)
+			.css('background-color', task_colors[taskObj.color])
+			.click(function() {
+				var curr_color_id = +$(this).attr('color-id');
+				var new_color_id = (curr_color_id < task_colors.length - 1) ? curr_color_id + 1 : 0;
+				$(this)
+					.attr('color-id', new_color_id)
+					.css('background-color', task_colors[new_color_id]);
+			}).mouseover(function() {
+				$(this).css('background-color', task_hover_colors[$(this).attr('color-id')]);
+			}).mouseout(function() {
+				$(this).css('background-color', task_colors[$(this).attr('color-id')]);
+			});
 		task_close.appendTo(task)
 			.click(function() {
 				completeTask(taskObj.task_id);
