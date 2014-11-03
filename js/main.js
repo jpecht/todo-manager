@@ -4,9 +4,9 @@ $.noty.defaults.timeout = 1500;
 $.noty.defaults.closeWith = ['click', 'button'];
 
 // colors!
-var task_colors = ['#FFFFFF', '#AEC7E8', '#FFBB78', '#98DF8A', '#FF9896', '#C5B0D5', '#C49C94', '#F7B6D2', '#C7C7C7'];
-var task_hover_colors = ['#DDDDDD', '#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B', '#E377C2', '#7F7F7F'];
-var color_schemes = {
+var TASK_COLORS = ['#FFFFFF', '#AEC7E8', '#FFBB78', '#98DF8A', '#FF9896', '#C5B0D5', '#C49C94', '#F7B6D2', '#C7C7C7'];
+var TASK_HOVER_COLORS = ['#DDDDDD', '#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B', '#E377C2', '#7F7F7F'];
+var COLOR_SCHEMES = {
 	light: {
 		color: '#333333',
 		background_color: '#FFFFFF',
@@ -22,14 +22,15 @@ var color_schemes = {
 		color_logged_in_text: '#5EC85E'
 	}
 };
-color_schemes.default = color_schemes.light;
+COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 
 
 (function() {
 	// user information (username, email, etc.)
 	var USR = {
 		logged_in: false,
-		num_lists: 3
+		num_lists: 3,
+		tasks: []
 	};
 	
 	// command line variables
@@ -56,6 +57,7 @@ color_schemes.default = color_schemes.light;
 				});
 				
 				applyColorScheme();
+				$('.block-completed-link').show();
 				fillListNames();
 				getTasks();
 			}
@@ -222,7 +224,17 @@ color_schemes.default = color_schemes.light;
 				tasks.sort(function(a, b) {
 					return +a.order_id - +b.order_id;
 				});
-				for (var i = 0; i < tasks.length; i++) addTaskToDisplay(tasks[i]);
+				for (var i = 0; i < tasks.length; i++) {
+					USR.tasks.push(tasks[i]);
+					addTaskToDisplay(tasks[i]);
+				}
+				$('.block').each(function() {
+					var content = $(this);
+					angular.element(document.body).injector().invoke(function($compile) {
+						var scope = angular.element(content).scope();
+						$compile(content)(scope);
+					});
+				});
 			})
 			.fail(failFunction);
 	};
@@ -250,18 +262,23 @@ color_schemes.default = color_schemes.light;
 			.attr('task-id', taskObj.task_id)
 			.attr('order-id', taskObj.order_id)
 			.attr('color-id', taskObj.color)
-			.css('background-color', task_colors[taskObj.color])
+			.css('background-color', TASK_COLORS[taskObj.color])
+			.css('opacity', 0.75)
+			.toggleClass('task-complete', taskObj.date_completed !== null)
 			.click(function() {
 				var curr_color_id = +$(this).attr('color-id');
-				var new_color_id = (curr_color_id < task_colors.length - 1) ? curr_color_id + 1 : 0;
+				var new_color_id = (curr_color_id < TASK_COLORS.length - 1) ? curr_color_id + 1 : 0;
 				$(this)
 					.attr('color-id', new_color_id)
-					.css('background-color', task_colors[new_color_id]);
+					.css('background-color', TASK_COLORS[new_color_id]);
 			}).mouseover(function() {
-				$(this).css('background-color', task_hover_colors[$(this).attr('color-id')]);
+				$(this).css('opacity', 1);
 			}).mouseout(function() {
-				$(this).css('background-color', task_colors[$(this).attr('color-id')]);
+				$(this).css('opacity', 0.75);
 			});
+		if (taskObj.date_completed !== null) {
+			task.attr('ng-show', 'tc.showingCompleted');
+		}
 		task_close.appendTo(task)
 			.click(function() {
 				completeTask(taskObj.task_id);
@@ -282,7 +299,7 @@ color_schemes.default = color_schemes.light;
 				var task_element = $('#task-' + task_id);
 				task_element.animate({
 					color: 'white',
-					backgroundColor: color_schemes[USR.color_scheme].color_task_complete
+					backgroundColor: COLOR_SCHEMES[USR.color_scheme].color_task_complete
 				}, 300, 'linear', function() {
 					setTimeout(function() {
 						task_element.animate({
@@ -365,7 +382,7 @@ color_schemes.default = color_schemes.light;
 		if (splitArr.length === 2) {
 			// ex: "add clean"
 			
-			if (action === 'scheme' && !color_schemes.hasOwnProperty(splitArr[1])) {
+			if (action === 'scheme' && !COLOR_SCHEMES.hasOwnProperty(splitArr[1])) {
 				cmd.error = 'Color scheme not found';
 				return cmd;				
 			}
@@ -425,7 +442,7 @@ color_schemes.default = color_schemes.light;
 	
 	/* --- Color Scheme --- */
 	var applyColorScheme = function() {
-		var current_scheme = color_schemes[USR.color_scheme];
+		var current_scheme = COLOR_SCHEMES[USR.color_scheme];
 		$(document.body)
 			.css('background-color', current_scheme.background_color)
 			.css('color', current_scheme.color);
@@ -451,6 +468,7 @@ color_schemes.default = color_schemes.light;
 
 	/* --- Initialize Task Sortability --- */
 	$('.block').sortable({
+		cancel: 'div',
 		connectWith: '.block',
 		update: function(evt, ui) {
 			// reordering task within list

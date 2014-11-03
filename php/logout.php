@@ -11,5 +11,5 @@
 	}
 	
 	// redirect (not working atm)
-	header('Location: http://www.jpecht.com/todo-man');
+	header('Location: http://www.jpecht.com/todo-manager');
 ?>

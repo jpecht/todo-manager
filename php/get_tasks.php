@@ -2,7 +2,7 @@
 	require_once('connect.php');
 	session_start();
 		
-	$query = 'SELECT * FROM tasks WHERE user_id = ' . $_SESSION['user_id'] . ' AND date_completed IS NULL'; 
+	$query = 'SELECT * FROM tasks WHERE user_id = ' . $_SESSION['user_id']; 
 	$result = mysqli_query($connection, $query);
 	
 	$tasks = array();
@@ -12,6 +12,7 @@
 			"description" => $row["description"],
 			"list_num" => $row["list_num"],
 			"date_created" => $row["date_created"],
+			"date_completed" => $row["date_completed"],
 			"order_id" => $row["order_id"],
 			"color" => $row["color"]
 		));

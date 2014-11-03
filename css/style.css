@@ -92,6 +92,7 @@ ul {
 	bottom: 5px;
 	text-align: center;
 	font-size: 0.9em;
+	display: none;
 }
 .task {
 	position: relative;
@@ -101,6 +102,7 @@ ul {
 	background-color: white;
 	box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 	border-radius: 10px;
+	box-sizing: border-box;
 	cursor: default;
 }
 .task:hover {
@@ -113,6 +115,9 @@ ul {
 	top: 7px;
 	right: 10px;
 	cursor: pointer;
+}
+.task-complete {
+	text-decoration: line-through;
 }
 
 
@@ -188,5 +193,8 @@ ul {
 		top: 10px;
 		left: 0px;
 		display: inline-block;
+	}
+	.block {
+		min-height: 100px;
 	}
 }
