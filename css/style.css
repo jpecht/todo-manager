@@ -86,13 +86,12 @@ ul {
 	text-align: center;
 	cursor: default;
 }
-.block-completed-link {
+.completed-task-toggle {
 	position: absolute;
 	width: 100%;
 	bottom: 5px;
 	text-align: center;
 	font-size: 0.9em;
-	display: none;
 }
 .task {
 	position: relative;

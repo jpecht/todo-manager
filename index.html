@@ -64,24 +64,24 @@
 			</div>
 		</div>
 		
-		<div class="masterlist container-fluid" ng-controller="TaskController as tc">
+		<div class="masterlist container-fluid">
 			<div class="row">
 				<div class="col-xs-12 col-sm-4">
 					<ul class="block block-1" block-id="1">
 						<div class="block-title" name="list-name-1">small</div>
-						<div class="block-completed-link link" block-id="1" ng-click="tc.toggleCompleted()">{{tc.completeText}}</div>
+						<div class="completed-task-toggle link" block-id="1">show completed</div>
 					</ul>
 				</div>
 				<div class="col-xs-12 col-sm-4">
 					<ul class="block block-2" block-id="2">
 						<div class="block-title" name="list-name-2">medium</div>
-						<div class="block-completed-link link" block-id="2" ng-click="tc.toggleCompleted()">{{tc.completeText}}</div>
+						<div class="completed-task-toggle link" block-id="2">show completed</div>
 					</ul>
 				</div>
 				<div class="col-xs-12 col-sm-4">
 					<ul class="block block-3" block-id="3">
 						<div class="block-title" name="list-name-3">large</div>
-						<div class="block-completed-link link" block-id="3" ng-click="tc.toggleCompleted()">{{tc.completeText}}</div>
+						<div class="completed-task-toggle link" block-id="3">show completed</div>
 					</ul>
 				</div>
 			</div>

@@ -40,12 +40,5 @@
 				this.showForm();
 				noty({type: 'success', timeout: 3000, text: 'Log in to complete verification!'});
 			}
-		}).controller('TaskController', function() {
-			this.showingCompleted = false;
-			this.completeText = 'show completed';
-			this.toggleCompleted = function() {
-				this.showingCompleted = !this.showingCompleted;
-				this.completeText = this.showingCompleted ? 'hide completed' : 'show completed';
-			};
 		});
 })();

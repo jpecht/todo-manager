@@ -37,6 +37,9 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 	var cmd_history = [],
 		cmd_history_index = -1,
 		cmd_history_search_type = 'basic';
+
+	// state variables
+	var showing_completed_tasks = false;
 	
 
 	/* --- Check for Returning User --- */
@@ -228,13 +231,6 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 					USR.tasks.push(tasks[i]);
 					addTaskToDisplay(tasks[i]);
 				}
-				$('.block').each(function() {
-					var content = $(this);
-					angular.element(document.body).injector().invoke(function($compile) {
-						var scope = angular.element(content).scope();
-						$compile(content)(scope);
-					});
-				});
 			})
 			.fail(failFunction);
 	};
@@ -276,9 +272,7 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 			}).mouseout(function() {
 				$(this).css('opacity', 0.75);
 			});
-		if (taskObj.date_completed !== null) {
-			task.attr('ng-show', 'tc.showingCompleted');
-		}
+		if (taskObj.date_completed !== null) task.hide();
 		task_close.appendTo(task)
 			.click(function() {
 				completeTask(taskObj.task_id);
@@ -512,6 +506,15 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 	$('.shield').click(function() {
 		var scope = angular.element($('.status-overlay')).scope();
 		scope.$apply(function() { scope.sc.hideForm(); });		
+	});
+
+	// --- Showing Completed Tasks --- //
+	$('.completed-task-toggle').click(function() {
+		showing_completed_tasks = !showing_completed_tasks;
+		$('.completed-task-toggle').html(function() {
+			return showing_completed_tasks ? 'hide completed' : 'show completed';
+		});
+		$('.task-complete').toggle();
 	});
 
 	/* --- Helper Functions --- */
