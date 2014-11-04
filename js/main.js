@@ -272,11 +272,14 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 			}).mouseout(function() {
 				$(this).css('opacity', 0.75);
 			});
-		if (taskObj.date_completed !== null) task.hide();
-		task_close.appendTo(task)
-			.click(function() {
-				completeTask(taskObj.task_id);
-			});
+		if (taskObj.date_completed !== null) {
+			task.hide();
+		} else {
+			task_close.appendTo(task)
+				.click(function() {
+					completeTask(taskObj.task_id);
+				});
+		}
 	};
 	var completeTask = function(task_id) {
 		NProgress.start();
@@ -291,18 +294,28 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 				NProgress.done();
 				
 				var task_element = $('#task-' + task_id);
-				task_element.animate({
-					color: 'white',
-					backgroundColor: COLOR_SCHEMES[USR.color_scheme].color_task_complete
-				}, 300, 'linear', function() {
-					setTimeout(function() {
-						task_element.animate({
-							opacity: 0
-						}, 300, 'linear', function() {
-							task_element.remove();
-						});
-					}, 200);
-				});
+
+				// disable x'ing out task
+				task_element.find('.task-close-icon').unbind('click');
+
+				// complete task animation
+				if (showing_completed_tasks) {
+					task_element.addClass('task-complete');
+				} else {
+					task_element.animate({
+						color: 'white',
+						backgroundColor: COLOR_SCHEMES[USR.color_scheme].color_task_complete
+					}, 300, 'linear', function() {
+						setTimeout(function() {
+							task_element.animate({
+								opacity: 0
+							}, 300, 'linear', function() {
+								task_element.hide();
+								task_element.addClass('task-complete');
+							});
+						}, 200);
+					});
+				}
 			}		
 		}).fail(failFunction);
 	};
