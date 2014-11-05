@@ -60,7 +60,7 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 				});
 				
 				applyColorScheme();
-				$('.block-completed-link').show();
+				$('.completed-task-toggle').show();
 				fillListNames();
 				getTasks();
 			}
@@ -267,6 +267,12 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 				$(this)
 					.attr('color-id', new_color_id)
 					.css('background-color', TASK_COLORS[new_color_id]);
+				
+				// send color change to server
+				$.post('php/change_task_color.php', {
+					task_id: taskObj.task_id,
+					color_id: new_color_id
+				});
 			}).mouseover(function() {
 				$(this).css('opacity', 1);
 			}).mouseout(function() {
