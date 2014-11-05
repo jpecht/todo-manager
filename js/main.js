@@ -261,6 +261,15 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 			.css('background-color', TASK_COLORS[taskObj.color])
 			.css('opacity', 0.75)
 			.toggleClass('task-complete', taskObj.date_completed !== null)
+			.mouseover(function() {
+				$(this).css('opacity', 1);
+			})
+			.mouseout(function() {
+				$(this).css('opacity', 0.75);
+			})
+			.mousedown(function(event) {
+				event.preventDefault();
+			})		
 			.click(function() {
 				var curr_color_id = +$(this).attr('color-id');
 				var new_color_id = (curr_color_id < TASK_COLORS.length - 1) ? curr_color_id + 1 : 0;
@@ -273,16 +282,13 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 					task_id: taskObj.task_id,
 					color_id: new_color_id
 				});
-			}).mouseover(function() {
-				$(this).css('opacity', 1);
-			}).mouseout(function() {
-				$(this).css('opacity', 0.75);
 			});
 		if (taskObj.date_completed !== null) {
 			task.hide();
 		} else {
 			task_close.appendTo(task)
-				.click(function() {
+				.click(function(event) {
+					event.stopPropagation();
 					completeTask(taskObj.task_id);
 				});
 		}

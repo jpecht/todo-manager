@@ -25,7 +25,9 @@
 			"list_num" => $list_num,
 			"task_id" => mysqli_insert_id($connection),
 			"date_created" => $date_created,
-			"order_id" => $new_max_id
+			"date_completed" => NULL,
+			"order_id" => $new_max_id,
+			"color" => 0
 		));
 	} else {
 		echo json_encode(array(
