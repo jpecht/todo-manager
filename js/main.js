@@ -4,8 +4,9 @@ $.noty.defaults.timeout = 1500;
 $.noty.defaults.closeWith = ['click', 'button'];
 
 // colors!
-var TASK_COLORS = ['#FFFFFF', '#AEC7E8', '#FFBB78', '#98DF8A', '#FF9896', '#C5B0D5', '#C49C94', '#F7B6D2', '#C7C7C7'];
-var TASK_HOVER_COLORS = ['#DDDDDD', '#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B', '#E377C2', '#7F7F7F'];
+
+// white, purple, blue, green, orange, red, brown, gray
+var TASK_COLORS = ['#FFFFFF', '#C5B0D5', '#AEC7E8', '#98DF8A', '#FFBB78', '#FF9896', '#C49C94', '#C7C7C7'];
 var COLOR_SCHEMES = {
 	light: {
 		color: '#333333',
@@ -269,8 +270,9 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 			})
 			.mousedown(function(event) {
 				event.preventDefault();
-			})		
-			.click(function() {
+			});
+		if (taskObj.date_completed === null) {
+			task.click(function() {
 				var curr_color_id = +$(this).attr('color-id');
 				var new_color_id = (curr_color_id < TASK_COLORS.length - 1) ? curr_color_id + 1 : 0;
 				$(this)
@@ -283,14 +285,13 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 					color_id: new_color_id
 				});
 			});
-		if (taskObj.date_completed !== null) {
-			task.hide();
-		} else {
 			task_close.appendTo(task)
 				.click(function(event) {
 					event.stopPropagation();
 					completeTask(taskObj.task_id);
 				});
+		} else {
+			task.hide(); // hide completed
 		}
 	};
 	var completeTask = function(task_id) {
@@ -487,7 +488,7 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 
 	/* --- Initialize Task Sortability --- */
 	$('.block').sortable({
-		cancel: 'div',
+		cancel: '.block-title, .completed-task-toggle',
 		connectWith: '.block',
 		update: function(evt, ui) {
 			// reordering task within list
