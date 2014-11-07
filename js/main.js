@@ -61,9 +61,9 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 				});
 				
 				applyColorScheme();
-				$('.completed-task-toggle').show();
 				fillListNames();
 				getTasks();
+				$('.completed-task-toggle, .block-title').show();
 			}
 		}).fail(failFunction);
 
@@ -544,7 +544,7 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 				task_id: ui.item.attr('task-id')
 			}, function(data) {
 				var response = $.parseJSON(data);
-				if (response.hasOwnProperty('error')) noty({type: 'warning', text: response.error});
+				//if (response.hasOwnProperty('error')) noty({type: 'warning', text: response.error});
 			});
 
 			ui.item.attr('order-id', new_order_id);
@@ -556,7 +556,7 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 				list_num: $(evt.target).attr('block-id')
 			}, function(data) {
 				var response = $.parseJSON(data);
-				if (response.hasOwnProperty('error')) noty({type: 'warning', text: response.error});
+				//if (response.hasOwnProperty('error')) noty({type: 'warning', text: response.error});
 			});
 		}
 	});

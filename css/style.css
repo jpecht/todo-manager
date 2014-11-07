@@ -85,6 +85,7 @@ ul {
 	font-size: 1em;
 	text-align: center;
 	cursor: default;
+	display: none;
 }
 .completed-task-toggle {
 	position: absolute;
