@@ -155,7 +155,6 @@ ul {
 /* --- General Classes --- */
 .link { cursor: pointer; }
 .link:hover { text-decoration: underline; }
-
 .shield {
 	position: absolute;
 	top: 0px;
@@ -165,7 +164,9 @@ ul {
 	z-index: 29;
 	display: none;
 }
-
+.noty-btn {
+	font-size: 0.8em;
+}
 .ng-dirty.ng-invalid { border-color: #FA787E; }
 .ng-dirty.ng-valid { border-color: #6ED064; }
 

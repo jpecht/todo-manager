@@ -271,6 +271,7 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 			.mousedown(function(event) {
 				event.preventDefault();
 			});
+		task_close.appendTo(task);
 		if (taskObj.date_completed === null) {
 			task.click(function() {
 				var curr_color_id = +$(this).attr('color-id');
@@ -285,13 +286,13 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 					color_id: new_color_id
 				});
 			});
-			task_close.appendTo(task)
-				.click(function(event) {
-					event.stopPropagation();
-					completeTask(taskObj.task_id);
-				});
+			task_close.click(function(event) {
+				event.stopPropagation();
+				completeTask(taskObj.task_id);
+			});
 		} else {
 			task.hide(); // hide completed
+			bindTaskCloseToDelete(task);
 		}
 	};
 	var completeTask = function(task_id) {
@@ -308,8 +309,9 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 				
 				var task_element = $('#task-' + task_id);
 
-				// disable x'ing out task
+				// bind x'ing out task to deleteTask
 				task_element.find('.task-close-icon').unbind('click');
+				bindTaskCloseToDelete(task_element);
 
 				// complete task animation
 				if (showing_completed_tasks) {
@@ -323,14 +325,46 @@ COLOR_SCHEMES.default = COLOR_SCHEMES.light;
 							task_element.animate({
 								opacity: 0
 							}, 300, 'linear', function() {
-								task_element.hide();
-								task_element.addClass('task-complete');
+								task_element.addClass('task-complete')
+									.hide()
+									.css('color', 'black')
+									.css('background-color', TASK_COLORS[+task_element.attr('color-id')])
+									.css('opacity', 1);
 							});
 						}, 200);
 					});
 				}
 			}		
 		}).fail(failFunction);
+	};
+	var deleteTask = function(task_id) {
+		NProgress.start();
+		$.post('php/delete_task.php', {
+			task_id: task_id
+		}).always(function() {
+			NProgress.done();
+		}).done(function() {
+			$('#task-' + task_id).remove();
+		});
+	};
+	var bindTaskCloseToDelete = function(task) {
+		task.find('.task-close-icon').click(function(event) {
+			event.stopPropagation();
+			noty({
+				layout: 'center',
+				text: '<strong>Delete task forever?</strong>',
+				buttons: [
+					{addClass: 'btn btn-success noty-btn', text: 'Yes', onClick: function($noty) {
+						$noty.close();
+						deleteTask(+task.attr('task-id'));
+					}},
+					{addClass: 'btn btn-danger noty-btn', text: 'No', onClick: function($noty) {
+						$noty.close();
+					}}
+				]
+			});
+			$('.noty_buttons').css('text-align', 'center');
+		});
 	};
 
 	// --------- lists ---------- //
